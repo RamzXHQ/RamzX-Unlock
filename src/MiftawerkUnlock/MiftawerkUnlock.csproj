@@ -27,6 +27,7 @@
       <HintPath>$(TestKeePassDir)KeePass.exe</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.26100.9169" />
   </ItemGroup>

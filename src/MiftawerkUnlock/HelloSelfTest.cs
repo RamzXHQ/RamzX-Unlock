@@ -139,13 +139,7 @@ namespace MiftawerkUnlock
             StringBuilder log)
         {
             RSAParameters p;
-            try
-            {
-                IBuffer blob = cred.RetrievePublicKey(CryptographicPublicKeyBlobType.BCryptPublicKey);
-                byte[] raw;
-                CryptographicBuffer.CopyToByteArray(blob, out raw);
-                p = ParseBCryptRsaPublicBlob(raw);
-            }
+            try { p = HelloKey.ExportPublicKey(cred); }
             catch (Exception ex)
             {
                 Log(log, "Public key export failed: " + ex.GetType().Name + " 0x" +
@@ -168,26 +162,6 @@ namespace MiftawerkUnlock
             }
         }
 
-        // BCRYPT_RSAKEY_BLOB: Magic, BitLength, cbPublicExp, cbModulus, cbPrime1, cbPrime2
-        // (6 x ULONG little-endian), then exponent and modulus as big-endian bytes.
-        private static RSAParameters ParseBCryptRsaPublicBlob(byte[] b)
-        {
-            const uint RsaPublicMagic = 0x31415352; // "RSA1"
-            if (b.Length < 24 || BitConverter.ToUInt32(b, 0) != RsaPublicMagic)
-                throw new FormatException("Not a BCRYPT_RSAPUBLIC_BLOB.");
-
-            int cbExp = (int)BitConverter.ToUInt32(b, 8);
-            int cbMod = (int)BitConverter.ToUInt32(b, 12);
-            if (b.Length < 24 + cbExp + cbMod) throw new FormatException("Truncated blob.");
-
-            RSAParameters p = new RSAParameters();
-            p.Exponent = new byte[cbExp];
-            p.Modulus = new byte[cbMod];
-            Array.Copy(b, 24, p.Exponent, 0, cbExp);
-            Array.Copy(b, 24 + cbExp, p.Modulus, 0, cbMod);
-            return p;
-        }
-
         /// <summary>
         /// Activates KeePass, runs the Hello operation and samples the foreground window
         /// every 150 ms, so the log shows whether the prompt really came to the front.
@@ -205,7 +179,7 @@ namespace MiftawerkUnlock
             timer.Interval = 150;
             timer.Tick += delegate
             {
-                if (BringHelloDialogToFront()) ++pushes;
+                if (HelloForeground.TryBringDialogToFront()) ++pushes;
 
                 string fg = DescribeForegroundWindow();
                 if (seen.Count == 0 || seen[seen.Count - 1] != fg) seen.Add(fg);
@@ -222,58 +196,6 @@ namespace MiftawerkUnlock
                     pushes + "x, foreground: " +
                     (seen.Count == 0 ? "(no sample)" : string.Join(" -> ", seen)));
             }
-        }
-
-        private const string HelloDialogClass = "Credential Dialog Xaml Host";
-        private const string HelloDialogProcess = "CredentialUIBroker";
-
-        /// <summary>
-        /// If the foreground window belongs to this process (KeePass) and a visible
-        /// Windows Hello dialog exists, makes the dialog the foreground window.
-        /// Matches by window class and process name, never by the localized title.
-        /// </summary>
-        private static bool BringHelloDialogToFront()
-        {
-            IntPtr fg = NativeMethods.GetForegroundWindow();
-            if (fg == IntPtr.Zero) return false;
-
-            uint fgPid;
-            NativeMethods.GetWindowThreadProcessId(fg, out fgPid);
-            if (fgPid != (uint)Process.GetCurrentProcess().Id) return false;
-
-            IntPtr dlg = FindHelloDialog();
-            if (dlg == IntPtr.Zero || dlg == fg) return false;
-
-            uint dlgPid;
-            NativeMethods.GetWindowThreadProcessId(dlg, out dlgPid);
-            NativeMethods.AllowSetForegroundWindow(dlgPid);
-            return NativeMethods.SetForegroundWindow(dlg);
-        }
-
-        private static IntPtr FindHelloDialog()
-        {
-            IntPtr found = IntPtr.Zero;
-            NativeMethods.EnumWindows(delegate(IntPtr h, IntPtr lp)
-            {
-                if (!NativeMethods.IsWindowVisible(h)) return true;
-
-                StringBuilder cls = new StringBuilder(256);
-                NativeMethods.GetClassName(h, cls, cls.Capacity);
-                if (cls.ToString() != HelloDialogClass) return true;
-
-                uint pid;
-                NativeMethods.GetWindowThreadProcessId(h, out pid);
-                try
-                {
-                    using (Process p = Process.GetProcessById((int)pid))
-                        if (p.ProcessName != HelloDialogProcess) return true;
-                }
-                catch (ArgumentException) { return true; }
-
-                found = h;
-                return false;
-            }, IntPtr.Zero);
-            return found;
         }
 
         private static byte[] HashPublicKey(KeyCredential cred)
@@ -388,38 +310,6 @@ namespace MiftawerkUnlock
             }
             catch (Exception) { } // log file is a convenience only
             return text;
-        }
-
-        private static class NativeMethods
-        {
-            [DllImport("user32.dll")]
-            internal static extern IntPtr GetForegroundWindow();
-
-            [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            internal static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName,
-                int nMaxCount);
-
-            [DllImport("user32.dll")]
-            internal static extern uint GetWindowThreadProcessId(IntPtr hWnd,
-                out uint lpdwProcessId);
-
-            internal delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool IsWindowVisible(IntPtr hWnd);
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool SetForegroundWindow(IntPtr hWnd);
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool AllowSetForegroundWindow(uint dwProcessId);
         }
     }
 }

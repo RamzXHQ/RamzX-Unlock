@@ -10,21 +10,29 @@ namespace MiftawerkUnlock
 {
     /// <summary>
     /// Plugin entry point. KeePass requires the class name "{Namespace}Ext".
-    /// Spike stage: only offers a Windows Hello self-test, does not touch any database.
     /// </summary>
     public sealed class MiftawerkUnlockExt : Plugin
     {
+        private const string Title = "Miftawerk Unlock";
+
         private IPluginHost m_host;
+        private Enrollment m_enrollment;
 
         public override bool Initialize(IPluginHost host)
         {
             if (host == null) return false;
             m_host = host;
+
+            m_enrollment = new Enrollment(host);
+            m_host.MainWindow.FileOpened += m_enrollment.OnFileOpened;
             return true;
         }
 
         public override void Terminate()
         {
+            if (m_host != null && m_enrollment != null)
+                m_host.MainWindow.FileOpened -= m_enrollment.OnFileOpened;
+            m_enrollment = null;
             m_host = null;
         }
 
@@ -32,7 +40,13 @@ namespace MiftawerkUnlock
         {
             if (t != PluginMenuType.Main) return null;
 
-            ToolStripMenuItem root = new ToolStripMenuItem("Miftawerk Unlock");
+            ToolStripMenuItem root = new ToolStripMenuItem(Title);
+
+            ToolStripMenuItem forget = new ToolStripMenuItem("Forget all Windows Hello unlock data");
+            forget.Click += OnForgetClick;
+            root.DropDownItems.Add(forget);
+
+            root.DropDownItems.Add(new ToolStripSeparator());
 
             ToolStripMenuItem test = new ToolStripMenuItem("Windows Hello self-test");
             test.Click += OnSelfTestClick;
@@ -45,11 +59,20 @@ namespace MiftawerkUnlock
             return root;
         }
 
+        private void OnForgetClick(object sender, EventArgs e)
+        {
+            string msg;
+            try { msg = RecordStore.DeleteAll() + " stored unlock record(s) deleted."; }
+            catch (Exception ex) { msg = "Delete failed: " + ex.Message; }
+            MessageBox.Show(m_host.MainWindow, msg, Title, MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
         private async void OnSelfTestClick(object sender, EventArgs e)
         {
             Form owner = m_host.MainWindow;
             string report = await HelloSelfTest.RunAsync(owner);
-            MessageBox.Show(owner, report, "Miftawerk Unlock - self-test",
+            MessageBox.Show(owner, report, Title + " - self-test",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -57,7 +80,7 @@ namespace MiftawerkUnlock
         {
             Form owner = m_host.MainWindow;
             string report = await HelloSelfTest.DeleteKeyAsync();
-            MessageBox.Show(owner, report, "Miftawerk Unlock - self-test",
+            MessageBox.Show(owner, report, Title + " - self-test",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
