@@ -1,0 +1,13 @@
+# Build output
+bin/
+obj/
+
+# Isolated KeePass test copy, test databases and logs - never commit
+testenv/
+*.kdbx
+*.kdbx.*
+*.log
+
+# IDE
+.vs/
+*.user

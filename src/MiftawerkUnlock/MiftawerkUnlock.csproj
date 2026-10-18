@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>MiftawerkUnlock</AssemblyName>
+    <RootNamespace>MiftawerkUnlock</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Deterministic>true</Deterministic>
+
+    <!-- KeePass loads a DLL plugin only if the product name is exactly "KeePass Plugin". -->
+    <Product>KeePass Plugin</Product>
+    <AssemblyTitle>Miftawerk Unlock</AssemblyTitle>
+    <Description>Quick unlock for KeePass 2 with Windows Hello.</Description>
+    <Company>SeeColors iT</Company>
+    <Copyright>Copyright (c) 2026 SeeColors iT</Copyright>
+    <Version>0.0.1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Isolated portable KeePass copy (never the installed one in Program Files). -->
+    <TestKeePassDir>$(MSBuildThisFileDirectory)..\..\testenv\KeePass\</TestKeePassDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="KeePass">
+      <HintPath>$(TestKeePassDir)KeePass.exe</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.26100.9169" />
+  </ItemGroup>
+
+  <Target Name="CopyToTestKeePass" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(TestKeePassDir)Plugins" />
+  </Target>
+
+</Project>
