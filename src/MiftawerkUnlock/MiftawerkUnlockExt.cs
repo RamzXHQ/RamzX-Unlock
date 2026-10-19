@@ -5,6 +5,7 @@ using System;
 using System.Windows.Forms;
 
 using KeePass.Plugins;
+using KeePass.UI;
 
 namespace MiftawerkUnlock
 {
@@ -17,6 +18,7 @@ namespace MiftawerkUnlock
 
         private IPluginHost m_host;
         private Enrollment m_enrollment;
+        private QuickUnlock m_quickUnlock;
 
         public override bool Initialize(IPluginHost host)
         {
@@ -25,13 +27,19 @@ namespace MiftawerkUnlock
 
             m_enrollment = new Enrollment(host);
             m_host.MainWindow.FileOpened += m_enrollment.OnFileOpened;
+
+            m_quickUnlock = new QuickUnlock(host);
+            GlobalWindowManager.WindowAdded += m_quickUnlock.OnWindowAdded;
             return true;
         }
 
         public override void Terminate()
         {
+            if (m_quickUnlock != null)
+                GlobalWindowManager.WindowAdded -= m_quickUnlock.OnWindowAdded;
             if (m_host != null && m_enrollment != null)
                 m_host.MainWindow.FileOpened -= m_enrollment.OnFileOpened;
+            m_quickUnlock = null;
             m_enrollment = null;
             m_host = null;
         }
