@@ -8,6 +8,7 @@
 
 **English** · [Deutsch](translations/README.de.md) · [العربية](translations/README.ar.md) · [Français](translations/README.fr.md) · [Español](translations/README.es.md) · [Italiano](translations/README.it.md) · [Nederlands](translations/README.nl.md) · [Polski](translations/README.pl.md) · [Português](translations/README.pt-BR.md) · [Türkçe](translations/README.tr.md)
 
+[![Build](https://github.com/SeeColors/miftawerk-unlock/actions/workflows/build.yml/badge.svg)](https://github.com/SeeColors/miftawerk-unlock/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Platform: Windows 10/11](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6)
 ![KeePass 2.60+](https://img.shields.io/badge/KeePass-2.60%2B-6aa84f)
