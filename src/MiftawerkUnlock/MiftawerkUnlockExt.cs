@@ -19,6 +19,7 @@ namespace MiftawerkUnlock
         private IPluginHost m_host;
         private Enrollment m_enrollment;
         private QuickUnlock m_quickUnlock;
+        private WindowsLockWatcher m_lockWatcher;
 
         public override bool Initialize(IPluginHost host)
         {
@@ -30,11 +31,15 @@ namespace MiftawerkUnlock
 
             m_quickUnlock = new QuickUnlock(host);
             GlobalWindowManager.WindowAdded += m_quickUnlock.OnWindowAdded;
+
+            m_lockWatcher = new WindowsLockWatcher(host);
             return true;
         }
 
         public override void Terminate()
         {
+            if (m_lockWatcher != null) m_lockWatcher.Dispose();
+            m_lockWatcher = null;
             if (m_quickUnlock != null)
                 GlobalWindowManager.WindowAdded -= m_quickUnlock.OnWindowAdded;
             if (m_host != null && m_enrollment != null)

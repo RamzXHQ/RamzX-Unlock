@@ -41,6 +41,14 @@ Fix: while a window of this process holds the foreground and a visible window of
 | Deterministic within session | Pass – 3/3 |
 | Padding | PKCS#1 v1.5 only |
 
+## 2026-10-19: Enrollment + quick unlock on test DB (`testenv/db/TESTDB.kdbx`)
+
+| Check | Result |
+|---|---|
+| Enrollment after manual unlock, record written to %LOCALAPPDATA% | Pass (2026-10-18 19:15) |
+| Quick unlock at master key prompt, face and fingerprint | Pass |
+| Save after quick unlock (entry "Test 1" added 09:05), close, reopen | Pass – entry present after reopen (user screenshot) |
+
 ## Still open
 
 - Exp. 2 across sleep, Fast Startup shutdown and reboot (stored challenge is in place).
