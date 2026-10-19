@@ -32,9 +32,10 @@
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.26100.9169" />
+    <InternalsVisibleTo Include="MiftawerkUnlock.Tests" />
   </ItemGroup>
 
-  <Target Name="CopyToTestKeePass" AfterTargets="Build" Condition="Exists('$(TestKeePassDir)KeePass.exe')">
+  <Target Name="CopyToTestKeePass" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug' And Exists('$(TestKeePassDir)KeePass.exe')">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(TestKeePassDir)Plugins" />
   </Target>
 

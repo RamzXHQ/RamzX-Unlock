@@ -22,10 +22,14 @@ namespace MiftawerkUnlock
         private static readonly byte[] DpapiEntropy =
             Encoding.ASCII.GetBytes("SeeColors.MiftawerkUnlock.Store.v1");
 
+        // Tests point this to a temporary folder; null = the per-user default below.
+        internal static string DirectoryOverride;
+
         internal static string Directory
         {
             get
             {
+                if (DirectoryOverride != null) return DirectoryOverride;
                 return Path.Combine(Environment.GetFolderPath(
                     Environment.SpecialFolder.LocalApplicationData),
                     "SeeColors", "MiftawerkUnlock", "records");
