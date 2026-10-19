@@ -36,7 +36,7 @@ KeePass is **locked when you lock Windows**.
 |---|---|
 | 🔓 **Windows Hello unlock** | Face, fingerprint or Windows Hello PIN at the KeePass master key prompt |
 | 🔐 **TPM-backed key** | The Windows Hello key is created by Windows and stays in the TPM (where present) |
-| ⏱️ **Automatic expiry** | Quick unlock ends after 7 days or at the next Windows restart |
+| ⏱️ **Automatic expiry** | Quick unlock ends after 7 days (configurable 1-30) or at the next Windows restart |
 | 🔒 **Locks with Windows** | KeePass locks on Win+L, session disconnect or sleep *(test pending)* |
 | 🗂️ **Per database, opt-in** | You decide for each database; default is *No* |
 | 💾 **Never writes your .kdbx** | Your database file is not modified by the plugin |
@@ -120,7 +120,7 @@ Windows 11 Smart App Control blocks unsigned DLLs. Signed releases are planned
 - [x] Windows Hello quick unlock with automatic expiry
 - [ ] Lock KeePass when Windows locks (implemented, test pending)
 - [ ] Signed releases (SignPath Foundation)
-- [ ] Settings dialog, German and Arabic UI
+- [x] Settings dialog (validity 1-30 days, opt-in prompt, lock with Windows), English / German / Arabic UI
 - [ ] YubiKey challenge-response as a real second factor (KeePassXC-compatible format)
 - [ ] Integration with the browser extension *Miftawerk Connect*
 

@@ -20,10 +20,12 @@ namespace MiftawerkUnlock
     internal sealed class WindowsLockWatcher : IDisposable
     {
         private readonly IPluginHost m_host;
+        private readonly Settings m_settings;
 
-        internal WindowsLockWatcher(IPluginHost host)
+        internal WindowsLockWatcher(IPluginHost host, Settings settings)
         {
             m_host = host;
+            m_settings = settings;
             SystemEvents.SessionSwitch += OnSessionSwitch;
             SystemEvents.PowerModeChanged += OnPowerModeChanged;
         }
@@ -55,6 +57,8 @@ namespace MiftawerkUnlock
 
         private void LockWorkspace()
         {
+            if (!m_settings.LockWithWindows) return;
+
             // SystemEvents may fire on a background thread; KeePass UI calls need the UI thread.
             MainForm mf = m_host.MainWindow;
             if (mf == null || mf.IsDisposed) return;

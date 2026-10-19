@@ -4,6 +4,7 @@
 using System;
 using System.Windows.Forms;
 
+using KeePass;
 using KeePass.Plugins;
 using KeePass.UI;
 
@@ -14,9 +15,8 @@ namespace MiftawerkUnlock
     /// </summary>
     public sealed class MiftawerkUnlockExt : Plugin
     {
-        private const string Title = "Miftawerk Unlock";
-
         private IPluginHost m_host;
+        private Settings m_settings;
         private Enrollment m_enrollment;
         private QuickUnlock m_quickUnlock;
         private WindowsLockWatcher m_lockWatcher;
@@ -26,13 +26,16 @@ namespace MiftawerkUnlock
             if (host == null) return false;
             m_host = host;
 
-            m_enrollment = new Enrollment(host);
+            Strings.Select(Program.Translation.Properties.Iso6391Code);
+            m_settings = new Settings(host.CustomConfig);
+
+            m_enrollment = new Enrollment(host, m_settings);
             m_host.MainWindow.FileOpened += m_enrollment.OnFileOpened;
 
             m_quickUnlock = new QuickUnlock(host);
             GlobalWindowManager.WindowAdded += m_quickUnlock.OnWindowAdded;
 
-            m_lockWatcher = new WindowsLockWatcher(host);
+            m_lockWatcher = new WindowsLockWatcher(host, m_settings);
             return true;
         }
 
@@ -46,6 +49,7 @@ namespace MiftawerkUnlock
                 m_host.MainWindow.FileOpened -= m_enrollment.OnFileOpened;
             m_quickUnlock = null;
             m_enrollment = null;
+            m_settings = null;
             m_host = null;
         }
 
@@ -53,39 +57,39 @@ namespace MiftawerkUnlock
         {
             if (t != PluginMenuType.Main) return null;
 
-            ToolStripMenuItem root = new ToolStripMenuItem(Title);
-
-            ToolStripMenuItem forget = new ToolStripMenuItem("Forget all Windows Hello unlock data");
-            forget.Click += OnForgetClick;
-            root.DropDownItems.Add(forget);
-
+            ToolStripMenuItem root = new ToolStripMenuItem(Ui.Title);
+            AddItem(root, Strings.MenuSettings, OnSettingsClick);
+            AddItem(root, Strings.MenuForget, OnForgetClick);
             root.DropDownItems.Add(new ToolStripSeparator());
-
-            ToolStripMenuItem test = new ToolStripMenuItem("Windows Hello self-test");
-            test.Click += OnSelfTestClick;
-            root.DropDownItems.Add(test);
-
-            ToolStripMenuItem del = new ToolStripMenuItem("Delete self-test key");
-            del.Click += OnDeleteClick;
-            root.DropDownItems.Add(del);
-
+            AddItem(root, Strings.MenuSelfTest, OnSelfTestClick);
+            AddItem(root, Strings.MenuDeleteSelfTest, OnDeleteClick);
             return root;
+        }
+
+        private static void AddItem(ToolStripMenuItem root, string key, EventHandler onClick)
+        {
+            ToolStripMenuItem item = new ToolStripMenuItem(Strings.Get(key));
+            item.Click += onClick;
+            root.DropDownItems.Add(item);
+        }
+
+        private void OnSettingsClick(object sender, EventArgs e)
+        {
+            UIUtil.ShowDialogAndDestroy(new SettingsForm(m_settings));
         }
 
         private void OnForgetClick(object sender, EventArgs e)
         {
-            string msg;
-            try { msg = RecordStore.DeleteAll() + " stored unlock record(s) deleted."; }
-            catch (Exception ex) { msg = "Delete failed: " + ex.Message; }
-            MessageBox.Show(m_host.MainWindow, msg, Title, MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+            try { Ui.Info(m_host.MainWindow, Strings.Format(Strings.ForgetDone, RecordStore.DeleteAll())); }
+            catch (Exception ex) { Ui.Warn(m_host.MainWindow, Strings.Format(Strings.DeleteFailed, ex.Message)); }
         }
 
+        // Self-test output is technical and stays English.
         private async void OnSelfTestClick(object sender, EventArgs e)
         {
             Form owner = m_host.MainWindow;
             string report = await HelloSelfTest.RunAsync(owner);
-            MessageBox.Show(owner, report, Title + " - self-test",
+            MessageBox.Show(owner, report, Ui.Title + " - self-test",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -93,7 +97,7 @@ namespace MiftawerkUnlock
         {
             Form owner = m_host.MainWindow;
             string report = await HelloSelfTest.DeleteKeyAsync();
-            MessageBox.Show(owner, report, Title + " - self-test",
+            MessageBox.Show(owner, report, Ui.Title + " - self-test",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }

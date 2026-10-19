@@ -26,8 +26,6 @@ namespace MiftawerkUnlock
     /// </summary>
     internal sealed class QuickUnlock
     {
-        private const string Title = "Miftawerk Unlock";
-
         private readonly IPluginHost m_host;
         // Path hashes whose next prompt must not be intercepted (after a failed quick unlock).
         private readonly HashSet<string> m_skipNext = new HashSet<string>();
@@ -121,10 +119,8 @@ namespace MiftawerkUnlock
             }
             catch (Exception ex)
             {
-                MessageBox.Show(kpf.IsDisposed ? (IWin32Window)m_host.MainWindow : kpf,
-                    "Windows Hello unlock failed: " + ex.GetType().Name + " 0x" +
-                    ex.HResult.ToString("X8") + "\r\nPlease use your master password.",
-                    Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Ui.Warn(kpf.IsDisposed ? (IWin32Window)m_host.MainWindow : kpf,
+                    Strings.Format(Strings.UnlockFailed, ex.GetType().Name + " 0x" + ex.HResult.ToString("X8")));
             }
             finally
             {
@@ -156,9 +152,7 @@ namespace MiftawerkUnlock
             if (!RecordCrypto.ConstantTimeEquals(db.RootGroup.Uuid.UuidBytes, rootUuid))
             {
                 RecordStore.Delete(pathHash);
-                MessageBox.Show(mf, "This file is not the database Windows Hello was enabled " +
-                    "for. Its Windows Hello data was removed.", Title, MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                Ui.Warn(mf, Strings.Get(Strings.WrongDatabase));
             }
         }
     }
