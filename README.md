@@ -145,9 +145,30 @@ not part of this repository).
 
 ## Code signing policy
 
-Planned: free code signing provided by [SignPath.io](https://about.signpath.io),
-certificate by [SignPath Foundation](https://signpath.org). Only binaries built automatically
-from this repository will be signed.
+Free code signing provided by [SignPath.io](https://about.signpath.io),
+certificate by [SignPath Foundation](https://signpath.org).
+*(Application in progress – current releases are not signed yet.)*
+
+- **What is signed:** only `MiftawerkUnlock.dll`, built automatically by
+  [GitHub Actions](.github/workflows/build.yml) from the tagged source code in this repository.
+  Third-party components are not signed by this project.
+- **Committers and reviewers:** [members of the SeeColors organization](https://github.com/orgs/SeeColors/people)
+- **Approvers:** [owners of the SeeColors organization](https://github.com/orgs/SeeColors/people?query=role%3Aowner)
+- **Reviews:** contributions from outside the team (pull requests) are reviewed by a team member
+  before they are merged. Every signing request is approved manually by an approver.
+- **Multi-factor authentication** is required for all team members on GitHub and SignPath.
+
+### Privacy policy
+
+This program will not transfer any information to other networked systems unless specifically
+requested by the user or the person installing or operating it.
+
+- Windows Hello (face, fingerprint, PIN) is part of Microsoft Windows; recognition happens inside
+  Windows and the plugin only receives a cryptographic signature. See Microsoft's
+  [Windows Hello privacy information](https://learn.microsoft.com/windows/security/identity-protection/hello-for-business/faq).
+- The plugin stores its encrypted unlock records only locally under
+  `%LOCALAPPDATA%\SeeColors\MiftawerkUnlock` and can delete them via
+  *Tools → Miftawerk Unlock → Forget all Windows Hello unlock data*.
 
 ## About SeeColors iT
 
