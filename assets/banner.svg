@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-labelledby="bt bd">
+  <title id="bt">Miftawerk Unlock – KeePass Windows Hello plugin</title>
+  <desc id="bd">Unlock KeePass 2 with your face, fingerprint or Windows Hello PIN. TPM-backed key, automatic expiry, locks with Windows, no telemetry, free and open source. By SeeColors iT.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1020"/><stop offset=".55" stop-color="#101a33"/><stop offset="1" stop-color="#0b1326"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.3" r="0.55">
+      <stop offset="0" stop-color="#1d4ed8" stop-opacity=".9"/><stop offset="1" stop-color="#1d4ed8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect width="1280" height="640" fill="url(#glow)"/>
+
+  <g font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">
+    <text x="80" y="170" font-size="22" font-weight="600" letter-spacing="3" fill="#7dd3fc">KEEPASS 2 PLUGIN · WINDOWS HELLO</text>
+    <text x="76" y="262" font-size="84" font-weight="700" fill="#f1f5ff">Miftawerk Unlock</text>
+    <text x="80" y="326" font-size="33" fill="#c7d2fe">Unlock KeePass with your <tspan fill="#ffffff" font-weight="600">face</tspan>, <tspan fill="#ffffff" font-weight="600">fingerprint</tspan></text>
+    <text x="80" y="370" font-size="33" fill="#c7d2fe">or <tspan fill="#ffffff" font-weight="600">Windows Hello PIN</tspan>.</text>
+
+    <g font-size="21" fill="#e8eefc">
+      <rect x="80" y="410" width="212" height="44" rx="22" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".16"/>
+      <text x="186" y="439" text-anchor="middle">TPM-backed key</text>
+      <rect x="304" y="410" width="166" height="44" rx="22" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".16"/>
+      <text x="387" y="439" text-anchor="middle">Auto-expiry</text>
+      <rect x="482" y="410" width="236" height="44" rx="22" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".16"/>
+      <text x="600" y="439" text-anchor="middle">Locks with Windows</text>
+      <rect x="80" y="466" width="182" height="44" rx="22" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".16"/>
+      <text x="171" y="495" text-anchor="middle">No telemetry</text>
+      <rect x="274" y="466" width="246" height="44" rx="22" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".16"/>
+      <text x="397" y="495" text-anchor="middle">Free &amp; open source</text>
+    </g>
+
+    <text x="80" y="590" font-size="22" fill="#94a3b8">by <tspan fill="#e2e8f0" font-weight="600">SeeColors iT</tspan> · seecolors.de · MIT license</text>
+  </g>
+
+  <g transform="translate(790 110)">
+    <circle cx="210" cy="210" r="196" fill="#ffffff" fill-opacity=".04" stroke="#ffffff" stroke-opacity=".12" stroke-width="2"/>
+    <path d="M140 170 v-40 a70 70 0 0 1 140 0 v40" fill="none" stroke="url(#g)" stroke-width="22" stroke-linecap="round"/>
+    <rect x="100" y="165" width="220" height="175" rx="34" fill="#0f172a" stroke="url(#g)" stroke-width="6"/>
+    <g fill="none" stroke="url(#g)" stroke-width="7" stroke-linecap="round">
+      <path d="M168 300 c-14-18 -20-38 -16-60 c6-30 32-48 58-48 c30 0 54 22 58 50"/>
+      <path d="M186 312 c-12-16 -16-34 -12-52 c4-20 20-32 38-32 c20 0 36 16 36 38 c0 14 -4 26 -2 40"/>
+      <path d="M210 318 c-10-22 -12-40 -8-56 c2-8 6-12 10-12 c6 0 10 6 10 16 c0 22 6 36 16 48"/>
+      <path d="M232 320 c-6-10 -10-22 -10-36"/>
+    </g>
+    <circle cx="330" cy="110" r="46" fill="#0f172a" stroke="url(#g)" stroke-width="5"/>
+    <g stroke="#7dd3fc" stroke-width="6" stroke-linecap="round" fill="none">
+      <path d="M312 100 v6"/><path d="M348 100 v6"/>
+      <path d="M312 124 q18 16 36 0"/>
+    </g>
+  </g>
+</svg>

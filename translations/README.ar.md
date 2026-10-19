@@ -1,5 +1,7 @@
 <div align="center" dir="rtl">
 
+<img src="../assets/banner.svg" alt="Miftawerk Unlock - KeePass Windows Hello plugin by SeeColors iT" width="100%">
+
 # Miftawerk Unlock
 
 ### إضافة Windows Hello لبرنامج KeePass – افتح KeePass 2 بوجهك أو ببصمة إصبعك

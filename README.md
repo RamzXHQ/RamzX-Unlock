@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/banner.svg" alt="Miftawerk Unlock - KeePass Windows Hello plugin by SeeColors iT: unlock KeePass with face, fingerprint or PIN" width="100%">
+
 # Miftawerk Unlock
 
 ### KeePass Windows Hello plugin – unlock KeePass 2 with your face or fingerprint
@@ -41,7 +43,15 @@ KeePass is **locked when you lock Windows**.
 | 🌍 **Any Windows language** | The Windows Hello dialog is brought to the front independent of language |
 | 🚫 **No telemetry** | No network access, no data collection |
 
+## Screenshots
+
+| Windows Hello at the KeePass prompt | KeePass unlocked – no password typed |
+|---|---|
+| <img src="assets/screenshots/windows-hello-fingerprint-prompt-keepass.png" alt="Windows Hello fingerprint prompt unlocking KeePass 2 (German Windows)" width="400"> | <img src="assets/screenshots/keepass-unlocked-with-windows-hello.png" alt="KeePass 2 test database unlocked with Windows Hello fingerprint" width="400"> |
+
 ## How it works
+
+<img src="assets/how-it-works.svg" alt="How Miftawerk Unlock works: master password once, enable Windows Hello, unlock with face or fingerprint, automatic expiry after 7 days or restart" width="100%">
 
 1. Open your database once with the master password as usual.
 2. Miftawerk Unlock asks: *"Enable Windows Hello quick unlock for this database?"*

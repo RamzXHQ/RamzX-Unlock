@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="../assets/banner.svg" alt="Miftawerk Unlock - KeePass Windows Hello plugin by SeeColors iT" width="100%">
+
 # Miftawerk Unlock
 
 ### Wtyczka Windows Hello do KeePass – odblokuj KeePass 2 twarzą lub odciskiem palca
