@@ -14,17 +14,19 @@
     <Description>Quick unlock for KeePass 2 with Windows Hello.</Description>
     <Company>SeeColors iT</Company>
     <Copyright>Copyright (c) 2026 SeeColors iT</Copyright>
-    <Version>0.0.1</Version>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Isolated portable KeePass copy (never the installed one in Program Files). -->
+    <!-- Isolated portable KeePass copy (never the installed one in Program Files).
+         CI passes /p:KeePassDir=... pointing to the verified official KeePass ZIP. -->
     <TestKeePassDir>$(MSBuildThisFileDirectory)..\..\testenv\KeePass\</TestKeePassDir>
+    <KeePassDir Condition="'$(KeePassDir)' == ''">$(TestKeePassDir)</KeePassDir>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="KeePass">
-      <HintPath>$(TestKeePassDir)KeePass.exe</HintPath>
+      <HintPath>$(KeePassDir)KeePass.exe</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="System.Security" />
@@ -32,7 +34,7 @@
     <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.26100.9169" />
   </ItemGroup>
 
-  <Target Name="CopyToTestKeePass" AfterTargets="Build">
+  <Target Name="CopyToTestKeePass" AfterTargets="Build" Condition="Exists('$(TestKeePassDir)KeePass.exe')">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(TestKeePassDir)Plugins" />
   </Target>
 
