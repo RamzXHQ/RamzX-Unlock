@@ -45,6 +45,9 @@ namespace MiftawerkUnlock
 
                 bool supported = await KeyCredentialManager.IsSupportedAsync();
                 Log(log, "IsSupported: " + supported);
+                if (SystemInformation.TerminalServerSession)
+                    Log(log, "Remote Desktop session: Windows Hello is not available over RDP. " +
+                        "Run the test directly at this computer.");
                 if (!supported) return Finish(log);
 
                 KeyCredentialRetrievalResult kr = await WithForegroundProbe(owner, log, "create",

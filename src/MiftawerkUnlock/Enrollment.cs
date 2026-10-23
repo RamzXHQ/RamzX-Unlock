@@ -46,6 +46,8 @@ namespace MiftawerkUnlock
             try
             {
                 if (!db.IsOpen || !m_settings.OfferEnrollment) return;
+                // Windows Hello is not available over Remote Desktop: do not ask (H12, no nagging).
+                if (SystemInformation.TerminalServerSession) return;
 
                 byte[] pathHash = RecordStore.DbPathHash(db.IOConnectionInfo);
                 string id = Convert.ToBase64String(pathHash);

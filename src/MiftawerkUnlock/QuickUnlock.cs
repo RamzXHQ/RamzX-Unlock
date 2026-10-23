@@ -40,6 +40,7 @@ namespace MiftawerkUnlock
             KeyPromptForm kpf = e.Form as KeyPromptForm;
             if (kpf == null) return;
             if (kpf.SecureDesktopMode) return; // Hello dialog would not be visible there (H14)
+            if (SystemInformation.TerminalServerSession) return; // no Windows Hello over Remote Desktop (H12)
 
             IOConnectionInfo ioc = GetPromptConnection(kpf);
             if (ioc == null || !ioc.IsLocalFile()) return;
