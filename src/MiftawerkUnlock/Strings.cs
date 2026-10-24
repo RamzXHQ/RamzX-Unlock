@@ -1,5 +1,5 @@
-// Miftawerk Unlock - KeePass 2 plugin
-// Copyright (c) 2026 SeeColors iT. MIT License.
+// RamzX Unlock - KeePass 2 plugin
+// Copyright (c) 2026 RamzX. MIT License.
 
 using System;
 using System.Collections.Generic;
@@ -115,7 +115,7 @@ namespace MiftawerkUnlock
                 { EnrollFailed, "Windows Hello setup failed: {0}" },
                 { UnlockFailed, "Windows Hello unlock failed: {0}\r\nPlease use your master password." },
                 { WrongDatabase, "This file is not the database Windows Hello was enabled for. Its Windows Hello data was removed." },
-                { SettingsTitle, "Miftawerk Unlock - Settings" },
+                { SettingsTitle, "RamzX Unlock - Settings" },
                 { ValidityLabel, "Quick unlock valid for (days):" },
                 { ValidityNote, "Quick unlock always ends at the next Windows restart. A changed value applies to databases enabled from now on." },
                 { OfferEnrollment, "Offer Windows Hello after opening a database with the master password" },
@@ -152,7 +152,7 @@ namespace MiftawerkUnlock
                 { EnrollFailed, "Einrichtung von Windows Hello fehlgeschlagen: {0}" },
                 { UnlockFailed, "Entsperren mit Windows Hello fehlgeschlagen: {0}\r\nBitte verwenden Sie Ihr Master-Passwort." },
                 { WrongDatabase, "Diese Datei ist nicht die Datenbank, für die Windows Hello aktiviert wurde. Die Windows-Hello-Daten wurden entfernt." },
-                { SettingsTitle, "Miftawerk Unlock - Einstellungen" },
+                { SettingsTitle, "RamzX Unlock - Einstellungen" },
                 { ValidityLabel, "Schnellentsperrung gültig für (Tage):" },
                 { ValidityNote, "Die Schnellentsperrung endet immer beim nächsten Windows-Neustart. Ein geänderter Wert gilt für ab jetzt aktivierte Datenbanken." },
                 { OfferEnrollment, "Windows Hello anbieten, nachdem eine Datenbank mit dem Master-Passwort geöffnet wurde" },
@@ -187,7 +187,7 @@ namespace MiftawerkUnlock
                 { EnrollFailed, "فشل إعداد Windows Hello: {0}" },
                 { UnlockFailed, "فشل الفتح عبر Windows Hello: {0}\r\nاستخدم كلمة السر الرئيسية من فضلك." },
                 { WrongDatabase, "هذا الملف ليس القاعدة التي فُعّل لها Windows Hello. تم حذف بيانات Windows Hello الخاصة به." },
-                { SettingsTitle, "Miftawerk Unlock - الإعدادات" },
+                { SettingsTitle, "RamzX Unlock - الإعدادات" },
                 { ValidityLabel, "مدة صلاحية الفتح السريع (بالأيام):" },
                 { ValidityNote, "ينتهي الفتح السريع دائماً عند إعادة تشغيل Windows. القيمة الجديدة تسري على القواعد التي تُفعَّل من الآن." },
                 { OfferEnrollment, "عرض Windows Hello بعد فتح قاعدة بكلمة السر الرئيسية" },

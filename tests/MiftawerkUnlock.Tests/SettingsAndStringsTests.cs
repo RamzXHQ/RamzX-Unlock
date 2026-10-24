@@ -1,5 +1,5 @@
-// Miftawerk Unlock - tests
-// Copyright (c) 2026 SeeColors iT. MIT License.
+// RamzX Unlock - tests
+// Copyright (c) 2026 RamzX. MIT License.
 
 using System;
 using System.Linq;

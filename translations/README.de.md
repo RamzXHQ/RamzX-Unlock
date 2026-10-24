@@ -1,20 +1,20 @@
 <div align="center">
 
-<img src="../assets/banner.svg" alt="Miftawerk Unlock - KeePass Windows Hello plugin by SeeColors iT" width="100%">
+<img src="../assets/banner.svg" alt="RamzX Unlock - KeePass Windows Hello plugin by RamzX" width="100%">
 
-# Miftawerk Unlock
+# RamzX Unlock
 
 ### KeePass Windows-Hello-Plugin – KeePass 2 mit Gesicht oder Fingerabdruck entsperren
 
 [English](../README.md) · **Deutsch** · [العربية](README.ar.md) · [Français](README.fr.md) · [Español](README.es.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt-BR.md) · [Türkçe](README.tr.md)
 
-Kostenlos und Open Source · Entwickelt von **[SeeColors iT](https://seecolors.de)**
+Kostenlos und Open Source · Entwickelt von **[RamzX](https://ramzx.de)**
 
 </div>
 
 ---
 
-**Miftawerk Unlock** ist ein kostenloses Open-Source-Plugin für **KeePass 2** (KeePass Password Safe).
+**RamzX Unlock** ist ein kostenloses Open-Source-Plugin für **KeePass 2** (KeePass Password Safe).
 Damit entsperren Sie Ihre KeePass-Datenbank mit **Windows Hello** – **Gesichtserkennung,
 Fingerabdruck oder Windows-Hello-PIN** – statt jedes Mal das Master-Passwort einzutippen.
 Der Windows-Hello-Schlüssel liegt im **TPM**, die Schnellentsperrung **läuft automatisch ab**,
@@ -37,14 +37,14 @@ und KeePass wird **gesperrt, wenn Sie Windows sperren**.
 ## So funktioniert es
 
 1. Datenbank wie gewohnt einmal mit dem Master-Passwort öffnen.
-2. Miftawerk Unlock fragt: *„Windows-Hello-Schnellentsperrung für diese Datenbank aktivieren?"*
+2. RamzX Unlock fragt: *„Windows-Hello-Schnellentsperrung für diese Datenbank aktivieren?"*
 3. Beim nächsten Öffnen erscheint Windows Hello – Blick in die Kamera oder Finger auflegen, fertig.
 4. Nach 7 Tagen oder einem Windows-Neustart ist wieder das Master-Passwort nötig.
 
 ## Häufige Fragen
 
 **Kann ich KeePass mit Fingerabdruck oder Gesicht entsperren?**
-Ja, mit einem Plugin. KeePass 2 unterstützt Windows Hello nicht von Haus aus. Miftawerk Unlock
+Ja, mit einem Plugin. KeePass 2 unterstützt Windows Hello nicht von Haus aus. RamzX Unlock
 ergänzt Windows Hello (Gesicht, Fingerabdruck, PIN) am KeePass-Anmeldedialog.
 
 **Ist Windows Hello ein zweiter Faktor für KeePass?**
@@ -58,19 +58,19 @@ Nein. Die Erkennung findet vollständig in Windows Hello statt; laut Microsoft v
 Daten das Gerät nicht. Das Plugin erhält nur eine Signatur.
 
 **Funktioniert es mit KeePassXC?**
-Nein. KeePassXC ist eine eigene Anwendung. Miftawerk Unlock ist ein Plugin für KeePass 2.
+Nein. KeePassXC ist eine eigene Anwendung. RamzX Unlock ist ein Plugin für KeePass 2.
 
 ## Datenschutz (DSGVO)
 
 Keine biometrischen Daten im Plugin, keine Telemetrie, keine Netzwerkverbindungen.
 Alle Daten bleiben verschlüsselt auf Ihrem PC unter Ihrem Windows-Benutzer.
 
-## Über SeeColors iT
+## Über RamzX
 
-Miftawerk Unlock wird von **[SeeColors iT](https://seecolors.de)** entwickelt und gepflegt.
-Fragen, Feedback oder geschäftliche Anfragen: **support@seecolors.de**
+RamzX Unlock wird von **[RamzX](https://ramzx.de)** entwickelt und gepflegt.
+Fragen, Feedback oder geschäftliche Anfragen: **support@ramzx.de**
 
 Ausführliche technische Dokumentation (Englisch): [README](../README.md)
 
-Lizenz: MIT · © 2026 SeeColors iT · KeePass ist ein Projekt von Dominik Reichl; Miftawerk Unlock ist
+Lizenz: MIT · © 2026 RamzX · KeePass ist ein Projekt von Dominik Reichl; RamzX Unlock ist
 ein unabhängiges Plugin. Windows Hello ist eine Marke von Microsoft.

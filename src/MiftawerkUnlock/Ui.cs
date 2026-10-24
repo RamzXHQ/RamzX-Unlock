@@ -1,5 +1,5 @@
-// Miftawerk Unlock - KeePass 2 plugin
-// Copyright (c) 2026 SeeColors iT. MIT License.
+// RamzX Unlock - KeePass 2 plugin
+// Copyright (c) 2026 RamzX. MIT License.
 
 using System.Windows.Forms;
 
@@ -8,7 +8,7 @@ namespace MiftawerkUnlock
     /// <summary>Message boxes with the plugin title and right-to-left layout for Arabic.</summary>
     internal static class Ui
     {
-        internal const string Title = "Miftawerk Unlock";
+        internal const string Title = "RamzX Unlock";
 
         private static MessageBoxOptions Options
         {

@@ -1,5 +1,5 @@
-// Miftawerk Unlock - KeePass 2 plugin
-// Copyright (c) 2026 SeeColors iT. MIT License.
+// RamzX Unlock - KeePass 2 plugin
+// Copyright (c) 2026 RamzX. MIT License.
 
 using System;
 using System.Threading.Tasks;
@@ -41,7 +41,7 @@ namespace MiftawerkUnlock
             try
             {
                 UserConsentVerificationResult r = await HelloForeground.RunAsync(owner as Form,
-                    () => UserConsentVerifier.RequestVerificationAsync(message ?? "Miftawerk Unlock").AsTask());
+                    () => UserConsentVerifier.RequestVerificationAsync(message ?? "RamzX Unlock").AsTask());
                 return r == UserConsentVerificationResult.Verified;
             }
             catch (Exception) { return false; }

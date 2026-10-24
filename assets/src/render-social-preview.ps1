@@ -57,7 +57,7 @@ $fKicker = Font 'Segoe UI Semibold' 22
 $x = 80
 foreach ($ch in "KEEPASS 2 PLUGIN $([char]0xB7) WINDOWS HELLO".ToCharArray()) { $x += (Text ([string]$ch) $fKicker '#7dd3fc' $x 170) + 3 }
 
-[void](Text 'Miftawerk Unlock' (Font 'Segoe UI' 84 'Bold') '#f1f5ff' 76 262)
+[void](Text 'RamzX Unlock' (Font 'Segoe UI' 84 'Bold') '#f1f5ff' 76 262)
 
 $fSub = Font 'Segoe UI' 33; $fSubB = Font 'Segoe UI Semibold' 33
 Runs @(@('Unlock KeePass with your ', $fSub, '#c7d2fe'), @('face', $fSubB, '#ffffff'), @(', ', $fSub, '#c7d2fe'), @('fingerprint', $fSubB, '#ffffff')) 80 326
@@ -81,8 +81,8 @@ foreach ($c in @(@(80,410,212,'TPM-backed key'), @(304,410,166,'Auto-expiry'), @
     [void](Text $c[3] $fChip '#e8eefc' ($c[0] + ($c[2] - $tw) / 2) ($c[1] + 29))
 }
 
-Runs @(@('by ', (Font 'Segoe UI' 22), '#94a3b8'), @('SeeColors iT', (Font 'Segoe UI Semibold' 22), '#e2e8f0'),
-       @(" $([char]0xB7) seecolors.de $([char]0xB7) MIT license", (Font 'Segoe UI' 22), '#94a3b8')) 80 590
+Runs @(@('by ', (Font 'Segoe UI' 22), '#94a3b8'), @('RamzX', (Font 'Segoe UI Semibold' 22), '#e2e8f0'),
+       @(" $([char]0xB7) ramzx.de $([char]0xB7) MIT license", (Font 'Segoe UI' 22), '#94a3b8')) 80 590
 
 # Illustration (same geometry as banner.svg, translated by 790,110)
 $g.TranslateTransform(790, 110)

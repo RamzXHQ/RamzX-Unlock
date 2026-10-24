@@ -169,7 +169,7 @@ DPAPI is documented and built into .NET Framework, but it involves no user-prese
 ## Q5. KeePass 2 plugin API facts (from keepass.info and the KeePass 2.x source)
 
 ### Takeaway
-A plugin must be a .NET Framework class library named per KeePass rules. KeePass exposes the pieces Miftawerk Unlock needs:
+A plugin must be a .NET Framework class library named per KeePass rules. KeePass exposes the pieces RamzX Unlock needs:
 - `KeyProvider`/`KeyProviderPool`;
 - a public `MainForm.OpenDatabase(IOConnectionInfo, CompositeKey, bool)` and `MainForm.LockAllDocuments()`;
 - the `FileClosingPre`, `FileClosingPost` and `FileClosed` events, which carry a locking flag;

@@ -1,27 +1,27 @@
 <div align="center">
 
-<img src="assets/banner.svg" alt="Miftawerk Unlock - KeePass Windows Hello plugin by SeeColors iT: unlock KeePass with face, fingerprint or PIN" width="100%">
+<img src="assets/banner.svg" alt="RamzX Unlock - KeePass Windows Hello plugin by RamzX: unlock KeePass with face, fingerprint or PIN" width="100%">
 
-# Miftawerk Unlock
+# RamzX Unlock
 
 ### KeePass Windows Hello plugin – unlock KeePass 2 with your face or fingerprint
 
 **English** · [Deutsch](translations/README.de.md) · [العربية](translations/README.ar.md) · [Français](translations/README.fr.md) · [Español](translations/README.es.md) · [Italiano](translations/README.it.md) · [Nederlands](translations/README.nl.md) · [Polski](translations/README.pl.md) · [Português](translations/README.pt-BR.md) · [Türkçe](translations/README.tr.md)
 
-[![Build](https://github.com/SeeColors/miftawerk-unlock/actions/workflows/build.yml/badge.svg)](https://github.com/SeeColors/miftawerk-unlock/actions/workflows/build.yml)
+[![Build](https://github.com/RamzXHQ/RamzX-Unlock/actions/workflows/build.yml/badge.svg)](https://github.com/RamzXHQ/RamzX-Unlock/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Platform: Windows 10/11](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6)
 ![KeePass 2.60+](https://img.shields.io/badge/KeePass-2.60%2B-6aa84f)
 ![Status: alpha](https://img.shields.io/badge/Status-alpha-orange)
 ![No telemetry](https://img.shields.io/badge/Telemetry-none-brightgreen)
 
-Free and open source · Made in Germany by **[SeeColors iT](https://seecolors.de)**
+Free and open source · Made in Germany by **[RamzX](https://ramzx.de)**
 
 </div>
 
 ---
 
-**Miftawerk Unlock** is a free, open-source plugin for **KeePass 2** (KeePass Password Safe)
+**RamzX Unlock** is a free, open-source plugin for **KeePass 2** (KeePass Password Safe)
 that lets you **unlock your KeePass database with Windows Hello** – **face recognition,
 fingerprint or Windows Hello PIN** – instead of typing the master password every time.
 The Windows Hello key is held in the **TPM**, quick unlock **expires automatically**, and
@@ -52,10 +52,10 @@ KeePass is **locked when you lock Windows**.
 
 ## How it works
 
-<img src="assets/how-it-works.svg" alt="How Miftawerk Unlock works: master password once, enable Windows Hello, unlock with face or fingerprint, automatic expiry after 7 days or restart" width="100%">
+<img src="assets/how-it-works.svg" alt="How RamzX Unlock works: master password once, enable Windows Hello, unlock with face or fingerprint, automatic expiry after 7 days or restart" width="100%">
 
 1. Open your database once with the master password as usual.
-2. Miftawerk Unlock asks: *"Enable Windows Hello quick unlock for this database?"*
+2. RamzX Unlock asks: *"Enable Windows Hello quick unlock for this database?"*
 3. Next time KeePass asks for the master key, Windows Hello appears on top.
    Look at the camera or touch the fingerprint reader – the database opens.
 4. After 7 days or a Windows restart, the master password is required again.
@@ -69,12 +69,12 @@ additionally protected with Windows DPAPI and stored locally in
 ## Frequently asked questions
 
 **Can I unlock KeePass with my fingerprint or face?**
-Yes, with a plugin. KeePass 2 has no built-in Windows Hello support. Miftawerk Unlock adds
+Yes, with a plugin. KeePass 2 has no built-in Windows Hello support. RamzX Unlock adds
 Windows Hello (face, fingerprint, PIN) to the KeePass master key prompt.
 
 **Does KeePass support Windows Hello natively?**
 No. KeePass 2 supports master password, key file and Windows user account. Windows Hello
-requires a plugin such as Miftawerk Unlock.
+requires a plugin such as RamzX Unlock.
 
 **Is Windows Hello a second factor for KeePass?**
 No – and we say this openly. Windows Hello always accepts the Windows Hello PIN. Anyone who
@@ -90,7 +90,7 @@ Microsoft, biometric data does not leave the device. The plugin only receives a 
 
 **Does it work with KeePassXC?**
 No. KeePassXC is a separate application with its own Windows Hello feature.
-Miftawerk Unlock is a plugin for KeePass 2 (by Dominik Reichl).
+RamzX Unlock is a plugin for KeePass 2 (by Dominik Reichl).
 
 **Why does Windows block the plugin ("Smart App Control")?**
 Windows 11 Smart App Control blocks unsigned DLLs. Signed releases are planned
@@ -122,7 +122,7 @@ Windows 11 Smart App Control blocks unsigned DLLs. Signed releases are planned
 - [ ] Signed releases (SignPath Foundation)
 - [x] Settings dialog (validity 1-30 days, opt-in prompt, lock with Windows), English / German / Arabic UI
 - [ ] YubiKey challenge-response as a real second factor (KeePassXC-compatible format)
-- [ ] Integration with the browser extension *Miftawerk Connect*
+- [ ] Integration with the browser extension *RamzX Connect*
 
 ## Research behind the design
 
@@ -130,7 +130,7 @@ Before writing any code we analysed public user reports of existing KeePass Wind
 and YubiKey solutions and tested the Windows APIs on real hardware:
 [research report](docs/research/report-windows-hello-keepass-plugins.md) ·
 [experiment results](docs/research/phase0/02-experiment-results.md).
-Miftawerk Unlock is written from scratch; no code was copied from other projects.
+RamzX Unlock is written from scratch; no code was copied from other projects.
 
 ## Build from source
 
@@ -152,8 +152,8 @@ certificate by [SignPath Foundation](https://signpath.org).
 - **What is signed:** only `MiftawerkUnlock.dll`, built automatically by
   [GitHub Actions](.github/workflows/build.yml) from the tagged source code in this repository.
   Third-party components are not signed by this project.
-- **Committers and reviewers:** [members of the SeeColors organization](https://github.com/orgs/SeeColors/people)
-- **Approvers:** [owners of the SeeColors organization](https://github.com/orgs/SeeColors/people?query=role%3Aowner)
+- **Committers and reviewers:** [members of the RamzX organization](https://github.com/orgs/RamzXHQ/people)
+- **Approvers:** [owners of the RamzX organization](https://github.com/orgs/RamzXHQ/people?query=role%3Aowner)
 - **Reviews:** contributions from outside the team (pull requests) are reviewed by a team member
   before they are merged. Every signing request is approved manually by an approver.
 - **Multi-factor authentication** is required for all team members on GitHub and SignPath.
@@ -168,19 +168,19 @@ requested by the user or the person installing or operating it.
   [Windows Hello privacy information](https://learn.microsoft.com/windows/security/identity-protection/hello-for-business/faq).
 - The plugin stores its encrypted unlock records only locally under
   `%LOCALAPPDATA%\SeeColors\MiftawerkUnlock` and can delete them via
-  *Tools → Miftawerk Unlock → Forget all Windows Hello unlock data*.
+  *Tools → RamzX Unlock → Forget all Windows Hello unlock data*.
 
-## About SeeColors iT
+## About RamzX
 
-Miftawerk Unlock is developed and maintained by **[SeeColors iT](https://seecolors.de)**, Germany.
-Questions, feedback or business inquiries: **support@seecolors.de**
+RamzX Unlock is developed and maintained by **[RamzX](https://ramzx.de)**, Germany.
+Questions, feedback or business inquiries: **support@ramzx.de**
 
-⭐ If Miftawerk Unlock is useful to you, please star the repository – it helps others find it.
+⭐ If RamzX Unlock is useful to you, please star the repository – it helps others find it.
 
 ## License
 
-MIT – see [LICENSE](LICENSE). © 2026 SeeColors iT.
-KeePass is a project by Dominik Reichl. Miftawerk Unlock is an independent plugin and not
+MIT – see [LICENSE](LICENSE). © 2026 RamzX.
+KeePass is a project by Dominik Reichl. RamzX Unlock is an independent plugin and not
 affiliated with the KeePass project. Windows Hello is a trademark of Microsoft.
 
 <sub>Keywords: KeePass Windows Hello plugin, KeePass fingerprint unlock, KeePass face unlock,

@@ -1,5 +1,5 @@
-// Miftawerk Unlock - KeePass 2 plugin
-// Copyright (c) 2026 SeeColors iT. MIT License.
+// RamzX Unlock - KeePass 2 plugin
+// Copyright (c) 2026 RamzX. MIT License.
 
 using System;
 using System.Runtime.InteropServices;

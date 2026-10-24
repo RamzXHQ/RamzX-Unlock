@@ -1,20 +1,20 @@
 <div align="center">
 
-<img src="../assets/banner.svg" alt="Miftawerk Unlock - KeePass Windows Hello plugin by SeeColors iT" width="100%">
+<img src="../assets/banner.svg" alt="RamzX Unlock - KeePass Windows Hello plugin by RamzX" width="100%">
 
-# Miftawerk Unlock
+# RamzX Unlock
 
 ### KeePass için Windows Hello eklentisi – KeePass 2'yi yüzünüz veya parmak izinizle açın
 
 [English](../README.md) · [Deutsch](README.de.md) · [العربية](README.ar.md) · [Français](README.fr.md) · [Español](README.es.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt-BR.md) · **Türkçe**
 
-Ücretsiz ve açık kaynak · Geliştiren: **[SeeColors iT](https://seecolors.de)**
+Ücretsiz ve açık kaynak · Geliştiren: **[RamzX](https://ramzx.de)**
 
 </div>
 
 ---
 
-**Miftawerk Unlock**, **KeePass 2** (KeePass Password Safe) için ücretsiz ve açık kaynaklı bir eklentidir.
+**RamzX Unlock**, **KeePass 2** (KeePass Password Safe) için ücretsiz ve açık kaynaklı bir eklentidir.
 Ana parolayı her seferinde yazmak yerine KeePass veritabanınızı **Windows Hello** ile –
 **yüz tanıma, parmak izi veya Windows Hello PIN'i** ile – açmanızı sağlar.
 Windows Hello anahtarı **TPM** içinde tutulur, hızlı kilit açma **otomatik olarak sona erer**
@@ -37,7 +37,7 @@ ve **Windows'u kilitlediğinizde KeePass da kilitlenir**.
 ## Sık sorulan sorular
 
 **KeePass'i parmak izi veya yüzümle açabilir miyim?**
-Evet, bir eklentiyle. KeePass 2 Windows Hello'yu doğrudan desteklemez; Miftawerk Unlock bunu ekler.
+Evet, bir eklentiyle. KeePass 2 Windows Hello'yu doğrudan desteklemez; RamzX Unlock bunu ekler.
 
 **Windows Hello, KeePass için ikinci bir faktör müdür?**
 Hayır – bunu açıkça söylüyoruz: Windows Hello her zaman PIN'i de kabul eder.
@@ -51,10 +51,10 @@ cihazdan çıkmaz. Eklenti yalnızca bir imza alır.
 
 Eklentide biyometrik veri yok, telemetri yok, ağ bağlantısı yok.
 
-## SeeColors iT hakkında
+## RamzX hakkında
 
-Miftawerk Unlock, **[SeeColors iT](https://seecolors.de)** tarafından geliştirilir ve bakımı yapılır.
-Sorular, geri bildirim veya iş talepleri: **support@seecolors.de**
+RamzX Unlock, **[RamzX](https://ramzx.de)** tarafından geliştirilir ve bakımı yapılır.
+Sorular, geri bildirim veya iş talepleri: **support@ramzx.de**
 
-Tam teknik belgeler (İngilizce): [README](../README.md) · MIT Lisansı · © 2026 SeeColors iT ·
-KeePass, Dominik Reichl'in bir projesidir; Miftawerk Unlock bağımsız bir eklentidir.
+Tam teknik belgeler (İngilizce): [README](../README.md) · MIT Lisansı · © 2026 RamzX ·
+KeePass, Dominik Reichl'in bir projesidir; RamzX Unlock bağımsız bir eklentidir.

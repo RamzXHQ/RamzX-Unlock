@@ -1,14 +1,14 @@
 <div align="center" dir="rtl">
 
-<img src="../assets/banner.svg" alt="Miftawerk Unlock - KeePass Windows Hello plugin by SeeColors iT" width="100%">
+<img src="../assets/banner.svg" alt="RamzX Unlock - KeePass Windows Hello plugin by RamzX" width="100%">
 
-# Miftawerk Unlock
+# RamzX Unlock
 
 ### إضافة Windows Hello لبرنامج KeePass – افتح KeePass 2 بوجهك أو ببصمة إصبعك
 
 [English](../README.md) · [Deutsch](README.de.md) · **العربية** · [Français](README.fr.md) · [Español](README.es.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt-BR.md) · [Türkçe](README.tr.md)
 
-مجانية ومفتوحة المصدر · من تطوير **[SeeColors iT](https://seecolors.de)**
+مجانية ومفتوحة المصدر · من تطوير **[RamzX](https://ramzx.de)**
 
 </div>
 
@@ -16,7 +16,7 @@
 
 ---
 
-**Miftawerk Unlock** إضافة مجانية ومفتوحة المصدر لبرنامج إدارة كلمات السر **KeePass 2**.
+**RamzX Unlock** إضافة مجانية ومفتوحة المصدر لبرنامج إدارة كلمات السر **KeePass 2**.
 تتيح لك فتح قاعدة بيانات KeePass عبر **Windows Hello** – **بالتعرف على الوجه أو ببصمة الإصبع
 أو برمز PIN** – بدلاً من كتابة كلمة السر الرئيسية في كل مرة.
 مفتاح Windows Hello محفوظ في شريحة **TPM**، والفتح السريع **ينتهي تلقائياً**،
@@ -46,7 +46,7 @@
 ## أسئلة شائعة
 
 **هل يمكن فتح KeePass ببصمة الإصبع أو بالوجه؟**
-نعم، عبر إضافة. KeePass 2 لا يدعم Windows Hello مباشرة، وMiftawerk Unlock تضيف ذلك.
+نعم، عبر إضافة. KeePass 2 لا يدعم Windows Hello مباشرة، وRamzX Unlock تضيف ذلك.
 
 **هل Windows Hello عامل تحقق ثانٍ لـ KeePass؟**
 لا – ونقولها بوضوح. Windows Hello يقبل دائماً رمز PIN أيضاً. من يعرف رمز PIN ويستطيع
@@ -61,14 +61,14 @@
 
 لا بيانات بيومترية داخل الإضافة، ولا تتبّع، ولا اتصالات شبكة. كل البيانات تبقى مشفّرة على جهازك.
 
-## عن SeeColors iT
+## عن RamzX
 
-تطوّر **[SeeColors iT](https://seecolors.de)** إضافة Miftawerk Unlock وتتولى صيانتها.
-للأسئلة والملاحظات والاستفسارات التجارية: **support@seecolors.de**
+تطوّر **[RamzX](https://ramzx.de)** إضافة RamzX Unlock وتتولى صيانتها.
+للأسئلة والملاحظات والاستفسارات التجارية: **support@ramzx.de**
 
 التوثيق التقني الكامل (بالإنجليزية): [README](../README.md)
 
-الرخصة: MIT · © 2026 SeeColors iT · KeePass مشروع من تطوير Dominik Reichl، وMiftawerk Unlock
+الرخصة: MIT · © 2026 RamzX · KeePass مشروع من تطوير Dominik Reichl، وRamzX Unlock
 إضافة مستقلة. Windows Hello علامة تجارية لشركة Microsoft.
 
 </div>

@@ -2,8 +2,8 @@
 
 ## Reporting a vulnerability
 
-Please report security issues privately by e-mail to **support@seecolors.de**
-(subject: "Miftawerk Unlock security"). Please do not open a public issue for vulnerabilities.
+Please report security issues privately by e-mail to **support@ramzx.de**
+(subject: "RamzX Unlock security"). Please do not open a public issue for vulnerabilities.
 
 We will confirm receipt and keep you informed about the fix.
 

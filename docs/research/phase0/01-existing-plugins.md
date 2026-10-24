@@ -36,7 +36,7 @@ The name "WinHelloQuickUnlock" was not found; this is the closest match.
   - #69 reports database corruption after "delete key" (title only, not verified).
   - Requests: multiple users / multiple PCs (#53, #70).
 
-## Lessons for Miftawerk Unlock
+## Lessons for RamzX Unlock
 
 1. Face + persistent key after restart is the weak point of KeePassWinHello → test Face, fingerprint and PIN separately, also after reboot.
 2. WinHelloUnlock has no expiry → our design needs expiry (reboot and/or X days) from the start.

@@ -1,6 +1,6 @@
 # KeePassXC Windows Hello "Quick Unlock": design and user complaints
 
-Research date: 2026-10-18. Scope: KeePassXC (GPL-2.0/3.0) Windows Hello Quick Unlock. These notes describe the design **in prose only**. No KeePassXC code is reproduced, and none should be copied into "Miftawerk Unlock".
+Research date: 2026-10-18. Scope: KeePassXC (GPL-2.0/3.0) Windows Hello Quick Unlock. These notes describe the design **in prose only**. No KeePassXC code is reproduced, and none should be copied into "RamzX Unlock".
 
 Verification legend: **[V-src]** = read the source myself (shallow clone of `develop` at commit d608efc1, dated 2026-10-18, plus the `2.7.12` tag). **[V-page]** = read the issue/PR page. **[V-commit]** = read the commit message/diff via the GitHub API. **[Title-only]** = only the title and date were seen in GitHub search results, not the content.
 
@@ -229,7 +229,7 @@ The latest **stable** release is **2.7.12 (2026-03-10)**, and the latest pre-rel
 - The `develop` Windows Hello implementation file has had no commits since the 2023 Polkit refactor, per the GitHub commits API. — [commits API](https://api.github.com/repos/keepassxreboot/keepassxc/commits?path=src/quickunlock/WindowsHello.cpp)
 
 ### Inferences
-- In 2.8.0 (when final), Windows users still lose quick unlock on every restart, reboot or database close. The earliest plausible KeePassXC release with persistent Windows Hello unlock is 2.9.0, with no date. KeePass 2 users also lack this today, which is the opportunity for "Miftawerk Unlock".
+- In 2.8.0 (when final), Windows users still lose quick unlock on every restart, reboot or database close. The earliest plausible KeePassXC release with persistent Windows Hello unlock is 2.9.0, with no date. KeePass 2 users also lack this today, which is the opportunity for "RamzX Unlock".
 
 ### Gaps
 - 2.8.0 final release date unknown (beta only, as of 2026-10-18).

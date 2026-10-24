@@ -1,20 +1,20 @@
 <div align="center">
 
-<img src="../assets/banner.svg" alt="Miftawerk Unlock - KeePass Windows Hello plugin by SeeColors iT" width="100%">
+<img src="../assets/banner.svg" alt="RamzX Unlock - KeePass Windows Hello plugin by RamzX" width="100%">
 
-# Miftawerk Unlock
+# RamzX Unlock
 
 ### Plugin de Windows Hello para KeePass – desbloquea KeePass 2 con tu rostro o tu huella dactilar
 
 [English](../README.md) · [Deutsch](README.de.md) · [العربية](README.ar.md) · [Français](README.fr.md) · **Español** · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt-BR.md) · [Türkçe](README.tr.md)
 
-Gratuito y de código abierto · Desarrollado por **[SeeColors iT](https://seecolors.de)**
+Gratuito y de código abierto · Desarrollado por **[RamzX](https://ramzx.de)**
 
 </div>
 
 ---
 
-**Miftawerk Unlock** es un plugin gratuito y de código abierto para **KeePass 2** (KeePass Password Safe).
+**RamzX Unlock** es un plugin gratuito y de código abierto para **KeePass 2** (KeePass Password Safe).
 Permite **desbloquear tu base de datos de KeePass con Windows Hello** – **reconocimiento facial,
 huella dactilar o PIN de Windows Hello** – en lugar de escribir la contraseña maestra cada vez.
 La clave de Windows Hello se guarda en el **TPM**, el desbloqueo rápido **caduca automáticamente**
@@ -37,7 +37,7 @@ y KeePass se **bloquea cuando bloqueas Windows**.
 ## Preguntas frecuentes
 
 **¿Puedo desbloquear KeePass con mi huella o mi rostro?**
-Sí, con un plugin. KeePass 2 no admite Windows Hello de forma nativa; Miftawerk Unlock lo añade.
+Sí, con un plugin. KeePass 2 no admite Windows Hello de forma nativa; RamzX Unlock lo añade.
 
 **¿Es Windows Hello un segundo factor para KeePass?**
 No, y lo decimos abiertamente: Windows Hello siempre acepta también el PIN.
@@ -51,10 +51,10 @@ biométricos no salen del dispositivo. El plugin solo recibe una firma.
 
 Sin datos biométricos en el plugin, sin telemetría, sin conexiones de red.
 
-## Sobre SeeColors iT
+## Sobre RamzX
 
-Miftawerk Unlock es desarrollado y mantenido por **[SeeColors iT](https://seecolors.de)**.
-Preguntas, comentarios o consultas comerciales: **support@seecolors.de**
+RamzX Unlock es desarrollado y mantenido por **[RamzX](https://ramzx.de)**.
+Preguntas, comentarios o consultas comerciales: **support@ramzx.de**
 
-Documentación técnica completa (inglés): [README](../README.md) · Licencia MIT · © 2026 SeeColors iT ·
-KeePass es un proyecto de Dominik Reichl; Miftawerk Unlock es un plugin independiente.
+Documentación técnica completa (inglés): [README](../README.md) · Licencia MIT · © 2026 RamzX ·
+KeePass es un proyecto de Dominik Reichl; RamzX Unlock es un plugin independiente.

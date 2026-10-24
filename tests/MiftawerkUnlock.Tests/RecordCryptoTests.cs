@@ -1,5 +1,5 @@
-// Miftawerk Unlock - tests
-// Copyright (c) 2026 SeeColors iT. MIT License.
+// RamzX Unlock - tests
+// Copyright (c) 2026 RamzX. MIT License.
 
 using System;
 using System.Security.Cryptography;
@@ -56,7 +56,7 @@ namespace MiftawerkUnlock.Tests
         public void AesCbc_RoundTrip_AndCiphertextDiffersFromPlaintext()
         {
             byte[] key = RecordCrypto.RandomBytes(32), iv = RecordCrypto.RandomBytes(16);
-            byte[] plain = Encoding.UTF8.GetBytes("Miftawerk Unlock test payload");
+            byte[] plain = Encoding.UTF8.GetBytes("RamzX Unlock test payload");
 
             byte[] cipher = RecordCrypto.AesCbcEncrypt(key, iv, plain);
 

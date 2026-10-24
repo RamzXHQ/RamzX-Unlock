@@ -1,7 +1,7 @@
 # Builds the plugin DLL from source on every push and pull request.
 # The KeePass.exe reference comes from the official KeePass ZIP, verified by SHA-256
 # (hash published at https://keepass.info/integrity.html).
-# Actions are pinned to full commit SHAs (required by the SeeColors org policy).
+# Actions are pinned to full commit SHAs (required by the RamzX org policy).
 name: Build
 
 on:
