@@ -43,7 +43,7 @@ KeePass is **locked when you lock Windows**.
 | 🛟 **Fail-safe** | Cancel or any error → the normal master password prompt |
 | 🌍 **Any Windows language** | The Windows Hello dialog is brought to the front independent of language |
 | 🚫 **No telemetry** | No network access, no data collection |
-| 🖥️ **Remote Desktop aware** | In a Remote Desktop session the normal password prompt is used (Windows Hello is not available there) |
+| 🖥️ **Works over Remote Desktop** | KeePass on another computer opens with the face or fingerprint of the PC you sit at (Windows Hello passkey via WebAuthn redirection, Windows 11 22H2+ on the remote computer) |
 | 🧩 **Works with RamzX OTP** | Other plugins can ask for Windows Hello through a small public API, e.g. [RamzX OTP](https://github.com/RamzXHQ/RamzX-OTP) before copying one-time codes |
 
 ## Screenshots
@@ -85,6 +85,13 @@ unlock is valid. It is a **convenience feature**. A YubiKey mode as a real secon
 
 **Does quick unlock survive a restart?**
 No, by design. After a Windows restart or after 7 days you enter the master password again.
+
+**Can I unlock KeePass over Remote Desktop with my fingerprint?**
+Yes (since 0.4.0). Windows forwards the Windows Hello request to the PC you sit at
+(*WebAuthn redirection*, enabled in the Remote Desktop client under *Local Resources → More*).
+A passkey for `unlock.ramzx.de` is stored in Windows Hello on your PC; its PRF secret, which never
+leaves Windows Hello, protects the quick-unlock data on the remote computer. Quick unlock then works
+only from that PC and ends at the next restart of the remote computer.
 
 **Does the plugin see my biometric data?**
 No. Face and fingerprint recognition happen entirely inside Windows Hello. According to

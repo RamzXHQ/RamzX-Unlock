@@ -86,6 +86,9 @@ namespace MiftawerkUnlock
         internal const string OfferEnrollment = "OfferEnrollment";
         internal const string LockWithWindows = "LockWithWindows";
         internal const string PinNote = "PinNote";
+        internal const string EnrollQuestionRemote = "EnrollQuestionRemote";
+        internal const string EnrollDoneRemote = "EnrollDoneRemote";
+        internal const string NoPasskeySecret = "NoPasskeySecret";
         internal const string Ok = "Ok";
         internal const string Cancel = "Cancel";
 
@@ -121,6 +124,13 @@ namespace MiftawerkUnlock
                 { OfferEnrollment, "Offer Windows Hello after opening a database with the master password" },
                 { LockWithWindows, "Lock KeePass when Windows is locked, disconnected or goes to sleep" },
                 { PinNote, "Windows Hello always accepts the Windows Hello PIN. This is a convenience feature, not a second factor." },
+                { EnrollQuestionRemote, "Enable quick unlock over Remote Desktop for this database?\r\n\r\n{0}\r\n\r\n" +
+                    "You confirm with Windows Hello (face, fingerprint or PIN) of the PC you are sitting at. " +
+                    "A passkey for \"unlock.ramzx.de\" is stored in Windows Hello on that PC; quick unlock then " +
+                    "works only from that PC, for {1} day(s) or until this computer restarts.\r\n\r\n" +
+                    "Important: Windows Hello always accepts the PIN. This is a convenience feature, not a second factor." },
+                { EnrollDoneRemote, "Quick unlock over Remote Desktop is enabled for this database until {0} or the next restart of this computer." },
+                { NoPasskeySecret, "Windows Hello on your PC answered, but without the secret needed for quick unlock (PRF). Nothing was changed." },
                 { Ok, "OK" },
                 { Cancel, "Cancel" },
             };
@@ -158,6 +168,13 @@ namespace MiftawerkUnlock
                 { OfferEnrollment, "Windows Hello anbieten, nachdem eine Datenbank mit dem Master-Passwort geöffnet wurde" },
                 { LockWithWindows, "KeePass sperren, wenn Windows gesperrt, getrennt oder in den Standby versetzt wird" },
                 { PinNote, "Windows Hello akzeptiert immer auch die Windows-Hello-PIN. Das ist eine Komfortfunktion, kein zweiter Faktor." },
+                { EnrollQuestionRemote, "Schnellentsperrung über Remotedesktop für diese Datenbank aktivieren?\r\n\r\n{0}\r\n\r\n" +
+                    "Sie bestätigen mit Windows Hello (Gesicht, Fingerabdruck oder PIN) des PCs, an dem Sie sitzen. " +
+                    "Dort wird ein Passkey für \"unlock.ramzx.de\" in Windows Hello gespeichert; die Schnellentsperrung " +
+                    "funktioniert dann nur von diesem PC aus, {1} Tag(e) lang oder bis zum Neustart dieses Computers.\r\n\r\n" +
+                    "Wichtig: Windows Hello akzeptiert immer auch die PIN. Das ist eine Komfortfunktion, kein zweiter Faktor." },
+                { EnrollDoneRemote, "Die Schnellentsperrung über Remotedesktop ist für diese Datenbank bis {0} oder bis zum nächsten Neustart dieses Computers aktiv." },
+                { NoPasskeySecret, "Windows Hello auf Ihrem PC hat geantwortet, aber ohne das für die Schnellentsperrung nötige Geheimnis (PRF). Es wurde nichts geändert." },
                 { Ok, "OK" },
                 { Cancel, "Abbrechen" },
             };
@@ -193,6 +210,13 @@ namespace MiftawerkUnlock
                 { OfferEnrollment, "عرض Windows Hello بعد فتح قاعدة بكلمة السر الرئيسية" },
                 { LockWithWindows, "قفل KeePass عند قفل Windows أو قطع الجلسة أو وضع السكون" },
                 { PinNote, "يقبل Windows Hello دائماً رمز PIN أيضاً. هذه ميزة للراحة، وليست عامل تحقق ثانياً." },
+                { EnrollQuestionRemote, "تفعيل الفتح السريع عبر سطح المكتب البعيد لهذه القاعدة؟\r\n\r\n{0}\r\n\r\n" +
+                    "تؤكّد بـ Windows Hello (الوجه أو البصمة أو رمز PIN) في الجهاز الذي تجلس أمامه. " +
+                    "يُحفظ مفتاح مرور باسم \"unlock.ramzx.de\" في Windows Hello على ذلك الجهاز، ويعمل الفتح السريع " +
+                    "بعدها من ذلك الجهاز فقط، لمدة {1} يوم/أيام أو حتى إعادة تشغيل هذا الحاسوب.\r\n\r\n" +
+                    "مهم: يقبل Windows Hello دائماً رمز PIN أيضاً. هذه ميزة للراحة، وليست عامل تحقق ثانياً." },
+                { EnrollDoneRemote, "تم تفعيل الفتح السريع عبر سطح المكتب البعيد لهذه القاعدة حتى {0} أو حتى إعادة تشغيل هذا الحاسوب." },
+                { NoPasskeySecret, "أجاب Windows Hello في جهازك، لكن بدون السر اللازم للفتح السريع (PRF). لم يتغيّر شيء." },
                 { Ok, "موافق" },
                 { Cancel, "إلغاء" },
             };

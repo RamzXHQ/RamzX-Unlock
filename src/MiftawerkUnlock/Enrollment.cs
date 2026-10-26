@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using KeePass.Forms;
@@ -46,8 +47,11 @@ namespace MiftawerkUnlock
             try
             {
                 if (!db.IsOpen || !m_settings.OfferEnrollment) return;
-                // Windows Hello is not available over Remote Desktop: do not ask (H12, no nagging).
-                if (SystemInformation.TerminalServerSession) return;
+                // The Windows Hello key does not work over Remote Desktop (H12). There, a passkey
+                // on the PC the user sits at is used instead - if Windows can redirect it;
+                // otherwise do not ask at all (no nagging).
+                bool remote = SystemInformation.TerminalServerSession;
+                if (remote && !WebAuthnPrf.IsAvailable()) return;
 
                 byte[] pathHash = RecordStore.DbPathHash(db.IOConnectionInfo);
                 string id = Convert.ToBase64String(pathHash);
@@ -61,10 +65,17 @@ namespace MiftawerkUnlock
                 if (snap == null) return;
 
                 TimeSpan validity = m_settings.Validity;
-                if (!Ui.Ask(owner, Strings.Format(Strings.EnrollQuestion,
+                if (!Ui.Ask(owner, Strings.Format(remote ? Strings.EnrollQuestionRemote : Strings.EnrollQuestion,
                     db.IOConnectionInfo.GetDisplayName(), (int)validity.TotalDays)))
                 {
                     m_declined.Add(id);
+                    return;
+                }
+
+                if (remote)
+                {
+                    plain = snap.Serialize();
+                    await EnrollPasskeyAsync(owner, db, pathHash, validity, plain);
                     return;
                 }
 
@@ -130,6 +141,75 @@ namespace MiftawerkUnlock
                 if (sig1 != null) Array.Clear(sig1, 0, sig1.Length);
                 if (sig2 != null) Array.Clear(sig2, 0, sig2.Length);
                 if (plain != null) Array.Clear(plain, 0, plain.Length);
+            }
+        }
+
+        /// <summary>
+        /// Remote Desktop: quick unlock with a passkey in Windows Hello of the PC the user sits at
+        /// (WebAuthn redirection). The record key comes from the passkey's PRF value for a random
+        /// per-database challenge. One passkey per Windows user is reused for all databases.
+        /// </summary>
+        private async Task EnrollPasskeyAsync(Form owner, PwDatabase db, byte[] pathHash, TimeSpan validity, byte[] plain)
+        {
+            IntPtr hwnd = owner.Handle;
+            byte[] challenge = RecordCrypto.RandomBytes(32);
+            byte[] s1 = null, s2 = null;
+            try
+            {
+                byte[] credId = RecordStore.TryLoadPasskeyId();
+                PrfResult p1 = null;
+                if (credId != null)
+                {
+                    p1 = await WebAuthnPrf.GetSecretAsync(hwnd, credId, challenge);
+                    if (p1.Status == PrfStatus.Cancelled) { Ui.Info(owner, Strings.Format(Strings.HelloStatus, p1.Status)); return; }
+                    if (p1.Status != PrfStatus.Success) credId = null; // e.g. other client PC: create a new passkey
+                }
+                if (credId == null)
+                {
+                    PrfResult c = await WebAuthnPrf.CreateAsync(hwnd);
+                    if (c.Status != PrfStatus.Success)
+                    {
+                        Ui.Info(owner, Strings.Format(Strings.HelloStatus, c.Status + " 0x" + c.HResult.ToString("X8")));
+                        return;
+                    }
+                    credId = c.Data;
+                    RecordStore.SavePasskeyId(credId);
+                    p1 = await WebAuthnPrf.GetSecretAsync(hwnd, credId, challenge);
+                }
+                if (p1.Status != PrfStatus.Success)
+                {
+                    Ui.Info(owner, p1.Status == PrfStatus.NoSecret ? Strings.Get(Strings.NoPasskeySecret)
+                        : Strings.Format(Strings.HelloStatus, p1.Status + " 0x" + p1.HResult.ToString("X8")));
+                    return;
+                }
+                s1 = p1.Data;
+
+                // Same requirement as for the Windows Hello key (H5): the secret must be repeatable.
+                PrfResult p2 = await WebAuthnPrf.GetSecretAsync(hwnd, credId, challenge);
+                if (p2.Status != PrfStatus.Success) { Ui.Info(owner, Strings.Format(Strings.HelloStatus, p2.Status)); return; }
+                s2 = p2.Data;
+                if (!RecordCrypto.ConstantTimeEquals(s1, s2)) { Ui.Info(owner, Strings.Get(Strings.NotRepeatable)); return; }
+
+                if (!db.IsOpen) return;
+                UnlockRecord rec = UnlockRecord.SealPrf(credId, pathHash, validity, challenge, s1, plain);
+                RecordStore.Save(rec);
+
+                UnlockRecord check = RecordStore.TryLoad(pathHash);
+                byte[] back = check == null ? null : check.Open(s1);
+                bool ok = back != null && RecordCrypto.ConstantTimeEquals(back, plain);
+                if (back != null) Array.Clear(back, 0, back.Length);
+                if (!ok)
+                {
+                    RecordStore.Delete(pathHash);
+                    Ui.Warn(owner, Strings.Get(Strings.SelfCheckFailed));
+                    return;
+                }
+                Ui.Info(owner, Strings.Format(Strings.EnrollDoneRemote, rec.ExpiresUtc.ToLocalTime().ToString("g")));
+            }
+            finally
+            {
+                if (s1 != null) Array.Clear(s1, 0, s1.Length);
+                if (s2 != null) Array.Clear(s2, 0, s2.Length);
             }
         }
     }

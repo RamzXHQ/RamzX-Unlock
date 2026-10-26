@@ -45,9 +45,11 @@ namespace MiftawerkUnlock
 
                 bool supported = await KeyCredentialManager.IsSupportedAsync();
                 Log(log, "IsSupported: " + supported);
+                Log(log, "WebAuthn API: " + WebAuthnPrf.ApiVersion() + ", passkey unlock available: " +
+                    WebAuthnPrf.IsAvailable() + ", stored passkey: " + (RecordStore.TryLoadPasskeyId() != null));
                 if (SystemInformation.TerminalServerSession)
-                    Log(log, "Remote Desktop session: Windows Hello is not available over RDP. " +
-                        "Run the test directly at this computer.");
+                    Log(log, "Remote Desktop session: the Windows Hello key is not available over RDP; " +
+                        "quick unlock uses a passkey on your local PC instead (WebAuthn redirection).");
                 if (!supported) return Finish(log);
 
                 KeyCredentialRetrievalResult kr = await WithForegroundProbe(owner, log, "create",

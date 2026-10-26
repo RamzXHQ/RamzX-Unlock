@@ -40,7 +40,6 @@ namespace MiftawerkUnlock
             KeyPromptForm kpf = e.Form as KeyPromptForm;
             if (kpf == null) return;
             if (kpf.SecureDesktopMode) return; // Hello dialog would not be visible there (H14)
-            if (SystemInformation.TerminalServerSession) return; // no Windows Hello over Remote Desktop (H12)
 
             IOConnectionInfo ioc = GetPromptConnection(kpf);
             if (ioc == null || !ioc.IsLocalFile()) return;
@@ -50,6 +49,9 @@ namespace MiftawerkUnlock
 
             UnlockRecord rec = RecordStore.TryLoad(pathHash);
             if (rec == null) return;
+            // The Windows Hello key does not work over Remote Desktop (H12); passkey records
+            // (WebAuthn PRF) do, through WebAuthn redirection to the PC the user sits at.
+            if (rec.Kind == RecordKind.HelloKey && SystemInformation.TerminalServerSession) return;
             if (!rec.IsCurrent(DateTime.UtcNow))
             {
                 RecordStore.Delete(pathHash); // expired or Windows restarted
@@ -90,17 +92,28 @@ namespace MiftawerkUnlock
             KeySnapshot snap = null;
             try
             {
-                KeyCredentialRetrievalResult kr = await KeyCredentialManager.OpenAsync(HelloKey.CredentialName);
-                if (kr.Status == KeyCredentialStatus.NotFound)
+                if (rec.Kind == RecordKind.WebAuthnPrf)
                 {
-                    RecordStore.Delete(rec.DbPathHash); // Windows Hello was reset
-                    return;
+                    // Cancelled, passkey not on this client PC, or no secret: the user types the
+                    // password. The record is kept - another client PC may be used next time.
+                    PrfResult p = await WebAuthnPrf.GetSecretAsync(kpf.Handle, rec.CredentialId, rec.Challenge);
+                    if (p.Status != PrfStatus.Success) return;
+                    sig = p.Data;
                 }
-                if (kr.Status != KeyCredentialStatus.Success) return;
+                else
+                {
+                    KeyCredentialRetrievalResult kr = await KeyCredentialManager.OpenAsync(HelloKey.CredentialName);
+                    if (kr.Status == KeyCredentialStatus.NotFound)
+                    {
+                        RecordStore.Delete(rec.DbPathHash); // Windows Hello was reset
+                        return;
+                    }
+                    if (kr.Status != KeyCredentialStatus.Success) return;
 
-                SignResult s = await HelloKey.SignAsync(kpf, kr.Credential, rec.Challenge);
-                if (s.Signature == null) return; // cancelled: user types the password
-                sig = s.Signature;
+                    SignResult s = await HelloKey.SignAsync(kpf, kr.Credential, rec.Challenge);
+                    if (s.Signature == null) return; // cancelled: user types the password
+                    sig = s.Signature;
+                }
 
                 if (kpf.IsDisposed || !kpf.Visible) return; // user already used the prompt
 

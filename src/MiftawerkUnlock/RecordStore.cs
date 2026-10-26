@@ -86,6 +86,34 @@ namespace MiftawerkUnlock
             if (File.Exists(f)) File.Delete(f);
         }
 
+        // ---- passkey for WebAuthn PRF records (one per Windows user, reused for all databases) ----
+
+        private static string PasskeyFile { get { return Path.Combine(Directory, "passkey.id"); } }
+
+        /// <summary>
+        /// Credential ID of the passkey created for WebAuthn quick unlock, or null. Not secret
+        /// (the secret stays in Windows Hello of the client PC); kept DPAPI-wrapped anyway.
+        /// </summary>
+        internal static byte[] TryLoadPasskeyId()
+        {
+            try
+            {
+                if (!File.Exists(PasskeyFile)) return null;
+                byte[] id = ProtectedData.Unprotect(File.ReadAllBytes(PasskeyFile), DpapiEntropy,
+                    DataProtectionScope.CurrentUser);
+                return id.Length > 0 && id.Length <= 1024 ? id : null;
+            }
+            catch (CryptographicException) { return null; }
+            catch (IOException) { return null; }
+        }
+
+        internal static void SavePasskeyId(byte[] credentialId)
+        {
+            System.IO.Directory.CreateDirectory(Directory);
+            File.WriteAllBytes(PasskeyFile, ProtectedData.Protect(credentialId, DpapiEntropy,
+                DataProtectionScope.CurrentUser));
+        }
+
         /// <returns>Number of deleted records.</returns>
         internal static int DeleteAll()
         {
