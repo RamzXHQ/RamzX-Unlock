@@ -14,7 +14,7 @@
     <Description>Quick unlock for KeePass 2 with Windows Hello.</Description>
     <Company>RamzX</Company>
     <Copyright>Copyright (c) 2026 RamzX</Copyright>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>

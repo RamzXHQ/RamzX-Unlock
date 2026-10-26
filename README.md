@@ -43,6 +43,8 @@ KeePass is **locked when you lock Windows**.
 | 🛟 **Fail-safe** | Cancel or any error → the normal master password prompt |
 | 🌍 **Any Windows language** | The Windows Hello dialog is brought to the front independent of language |
 | 🚫 **No telemetry** | No network access, no data collection |
+| 🖥️ **Remote Desktop aware** | In a Remote Desktop session the normal password prompt is used (Windows Hello is not available there) |
+| 🧩 **Works with RamzX OTP** | Other plugins can ask for Windows Hello through a small public API, e.g. [RamzX OTP](https://github.com/RamzXHQ/RamzX-OTP) before copying one-time codes |
 
 ## Screenshots
 
@@ -122,6 +124,7 @@ Windows 11 Smart App Control blocks unsigned DLLs. Signed releases are planned
 - [ ] Signed releases (SignPath Foundation)
 - [x] Settings dialog (validity 1-30 days, opt-in prompt, lock with Windows), English / German / Arabic UI
 - [ ] YubiKey challenge-response as a real second factor (KeePassXC-compatible format)
+- [x] Public API for other plugins (Windows Hello check), used by [RamzX OTP](https://github.com/RamzXHQ/RamzX-OTP)
 - [ ] Integration with the browser extension *RamzX Connect*
 
 ## Research behind the design
