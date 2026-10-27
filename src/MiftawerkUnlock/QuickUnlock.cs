@@ -39,8 +39,6 @@ namespace MiftawerkUnlock
         {
             KeyPromptForm kpf = e.Form as KeyPromptForm;
             if (kpf == null) return;
-            if (kpf.SecureDesktopMode) return; // Hello dialog would not be visible there (H14)
-
             IOConnectionInfo ioc = GetPromptConnection(kpf);
             if (ioc == null || !ioc.IsLocalFile()) return;
 
@@ -52,6 +50,11 @@ namespace MiftawerkUnlock
             // The Windows Hello key does not work over Remote Desktop (H12); passkey records
             // (WebAuthn PRF) do, through WebAuthn redirection to the PC the user sits at.
             if (rec.Kind == RecordKind.HelloKey && SystemInformation.TerminalServerSession) return;
+            // On KeePass's secure desktop a local Windows Hello dialog would not be visible (H14).
+            // Over Remote Desktop the passkey prompt is shown on the user's own PC instead, so the
+            // secure desktop of this computer does not hide it.
+            if (kpf.SecureDesktopMode &&
+                !(rec.Kind == RecordKind.WebAuthnPrf && SystemInformation.TerminalServerSession)) return;
             if (!rec.IsCurrent(DateTime.UtcNow))
             {
                 RecordStore.Delete(pathHash); // expired or Windows restarted
