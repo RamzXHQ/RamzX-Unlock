@@ -202,6 +202,19 @@ namespace MiftawerkUnlock
             return r;
         }
 
+        /// <summary>Number of databases with at least one stored record (any device).</summary>
+        internal static int CountDatabases()
+        {
+            if (!System.IO.Directory.Exists(Directory)) return 0;
+            HashSet<string> dbs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string f in System.IO.Directory.GetFiles(Directory, "*.mwu"))
+            {
+                string name = Path.GetFileNameWithoutExtension(f);
+                if (name.Length >= 64) dbs.Add(name.Substring(0, 64));
+            }
+            return dbs.Count;
+        }
+
         /// <returns>Number of deleted records.</returns>
         internal static int DeleteAll()
         {

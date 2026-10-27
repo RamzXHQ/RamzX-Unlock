@@ -26,8 +26,8 @@ namespace MiftawerkUnlock
             if (host == null) return false;
             m_host = host;
 
-            Strings.Select(Program.Translation.Properties.Iso6391Code);
             m_settings = new Settings(host.CustomConfig);
+            Strings.Select(Program.Translation.Properties.Iso6391Code, m_settings.Language);
 
             m_enrollment = new Enrollment(host, m_settings);
             m_host.MainWindow.FileOpened += m_enrollment.OnFileOpened;
@@ -58,6 +58,7 @@ namespace MiftawerkUnlock
             if (t != PluginMenuType.Main) return null;
 
             ToolStripMenuItem root = new ToolStripMenuItem(Ui.Title);
+            root.Image = Brand.MenuIcon(m_host.MainWindow);
             AddItem(root, Strings.MenuSettings, OnSettingsClick);
             AddItem(root, Strings.MenuForget, OnForgetClick);
             root.DropDownItems.Add(new ToolStripSeparator());
@@ -75,7 +76,8 @@ namespace MiftawerkUnlock
 
         private void OnSettingsClick(object sender, EventArgs e)
         {
-            UIUtil.ShowDialogAndDestroy(new SettingsForm(m_settings));
+            if (UIUtil.ShowDialogAndDestroy(new SettingsForm(m_settings)) == DialogResult.OK)
+                Strings.Select(Program.Translation.Properties.Iso6391Code, m_settings.Language);
         }
 
         private void OnForgetClick(object sender, EventArgs e)

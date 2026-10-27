@@ -83,7 +83,7 @@ namespace MiftawerkUnlock
                 string question = alreadyEnabled
                     ? Strings.Format(Strings.EnrollAnotherDevice, db.IOConnectionInfo.GetDisplayName(), (int)validity.TotalDays)
                     : Strings.Format(Strings.EnrollQuestion, db.IOConnectionInfo.GetDisplayName(), (int)validity.TotalDays);
-                if (!Ui.Ask(owner, question))
+                if (!EnrollForm.Ask(owner, question))
                 {
                     m_declined.Add(id);
                     return;

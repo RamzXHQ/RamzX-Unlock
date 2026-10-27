@@ -57,6 +57,36 @@ namespace MiftawerkUnlock.Tests
         {
             Assert.Throws<ArgumentNullException>(() => new Settings(null));
         }
+
+        [Fact]
+        public void Language_DefaultsToAutomatic_AndOnlyKnownValues()
+        {
+            AceCustomConfig cfg = new AceCustomConfig();
+            Settings s = new Settings(cfg);
+            Assert.Equal(string.Empty, s.Language);
+            s.Language = "fr";
+            Assert.Equal("fr", new Settings(cfg).Language);
+            cfg.SetString("MiftawerkUnlock.Language", "klingon");
+            Assert.Equal(string.Empty, new Settings(cfg).Language);
+        }
+    }
+
+    public class BrandTests
+    {
+        [Fact]
+        public void Logo_IsDrawn_InBrandColours()
+        {
+            using (System.Drawing.Bitmap b = Brand.Logo(64))
+            {
+                Assert.Equal(64, b.Width);
+                System.Drawing.Color centre = b.GetPixel(32, 32);
+                System.Drawing.Color corner = b.GetPixel(0, 0);
+                Assert.Equal(0, corner.A);                     // rounded corner is transparent
+                Assert.True(centre.B > centre.R);              // the blue "X" or navy background
+                Assert.Equal(Brand.Navy.ToArgb(), b.GetPixel(32, 6).ToArgb());
+            }
+            using (System.Drawing.Bitmap s = Brand.HelloSymbol(48)) Assert.Equal(48, s.Height);
+        }
     }
 
     public class StringsTests : IDisposable
@@ -88,15 +118,40 @@ namespace MiftawerkUnlock.Tests
         [Fact]
         public void SecurityNotice_IsPresentInEveryLanguage()
         {
-            Assert.Contains("PIN", Strings.Table("en")[Strings.EnrollQuestion]);
-            Assert.Contains("PIN", Strings.Table("de")[Strings.EnrollQuestion]);
-            Assert.Contains("PIN", Strings.Table("ar")[Strings.EnrollQuestion]);
+            foreach (string lang in Strings.Languages)
+            {
+                Assert.Contains("PIN", Strings.Table(lang)[Strings.EnrollQuestion]);
+                Assert.Contains("PIN", Strings.Table(lang)[Strings.EnrollAnotherDevice]);
+            }
+        }
+
+        [Fact]
+        public void TenLanguages_WithNativeNames()
+        {
+            Assert.Equal(10, Strings.Languages.Length);
+            Assert.Equal(Strings.Languages.Length, Strings.LanguageNames.Length);
+            Assert.Equal(Strings.Languages.Length, new System.Collections.Generic.HashSet<string>(Strings.Languages).Count);
+        }
+
+        [Fact]
+        public void Select_PreferredLanguageWins()
+        {
+            Strings.Select("de", "tr");
+            Assert.Equal("tr", Strings.Language);
+            Strings.Select("de", "");
+            Assert.Equal("de", Strings.Language);
+            Strings.Select("de", "en");
+            Assert.Equal("en", Strings.Language);
+            Strings.Select("de", "xx");
+            Assert.Equal("en", Strings.Language);
         }
 
         [Theory]
         [InlineData("de", "de", false)]
         [InlineData("ar", "ar", true)]
-        [InlineData("fr", "en", false)]
+        [InlineData("fr", "fr", false)]
+        [InlineData("TR", "tr", false)]
+        [InlineData("ja", "en", false)]
         [InlineData("", "en", false)]
         [InlineData(null, "en", false)]
         public void SetLanguage_SelectsTableAndDirection(string requested, string expected, bool rtl)

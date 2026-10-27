@@ -20,6 +20,7 @@ namespace MiftawerkUnlock
         private const string KeyValidityDays = "MiftawerkUnlock.ValidityDays";
         private const string KeyOfferEnrollment = "MiftawerkUnlock.OfferEnrollment";
         private const string KeyLockWithWindows = "MiftawerkUnlock.LockWithWindows";
+        private const string KeyLanguage = "MiftawerkUnlock.Language";
 
         private readonly AceCustomConfig m_cfg;
 
@@ -50,6 +51,17 @@ namespace MiftawerkUnlock
         {
             get { return m_cfg.GetBool(KeyLockWithWindows, true); }
             set { m_cfg.SetBool(KeyLockWithWindows, value); }
+        }
+
+        /// <summary>UI language ("en", "de", "ar", ...); empty = automatic (KeePass, then Windows).</summary>
+        internal string Language
+        {
+            get
+            {
+                string l = (m_cfg.GetString(KeyLanguage, string.Empty) ?? string.Empty).Trim().ToLowerInvariant();
+                return Array.IndexOf(Strings.Languages, l) >= 0 ? l : string.Empty;
+            }
+            set { m_cfg.SetString(KeyLanguage, value ?? string.Empty); }
         }
 
         internal static int ClampDays(long days)
