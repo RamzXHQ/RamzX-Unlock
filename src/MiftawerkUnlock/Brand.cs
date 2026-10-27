@@ -149,17 +149,34 @@ namespace MiftawerkUnlock
         }
 
         private int Pad { get { return (int)(Font.Height * 0.55f); } }
+        private int Dot { get { return (int)Math.Ceiling(Font.Height * 1.05f); } }
+
+        /// <summary>Text area width - the same for measuring and drawing, so no line is cut off.</summary>
+        private int TextWidth(int width) { return Math.Max(10, width - Pad * 3 - Dot); }
+
+        private TextFormatFlags Flags
+        {
+            get
+            {
+                return TextFormatFlags.WordBreak | TextFormatFlags.TextBoxControl |
+                    (RightToLeft == RightToLeft.Yes ? TextFormatFlags.Right | TextFormatFlags.RightToLeft : 0);
+            }
+        }
 
         internal int PreferredHeight(int width)
         {
-            Size s = TextRenderer.MeasureText(Text ?? string.Empty, Font, new Size(Math.Max(10, width - Pad * 3 - Font.Height), 0),
-                TextFormatFlags.WordBreak);
-            return s.Height + Pad * 2;
+            Size s = TextRenderer.MeasureText(Text ?? string.Empty, Font, new Size(TextWidth(width), 0), Flags);
+            return Math.Max(s.Height, Dot) + Pad * 2;
         }
 
-        protected override void OnResize(EventArgs e)
+        protected override void OnResize(EventArgs e) { base.OnResize(e); FitHeight(); }
+        protected override void OnParentChanged(EventArgs e) { base.OnParentChanged(e); FitHeight(); }
+        protected override void OnFontChanged(EventArgs e) { base.OnFontChanged(e); FitHeight(); }
+        protected override void OnRightToLeftChanged(EventArgs e) { base.OnRightToLeftChanged(e); FitHeight(); }
+
+        // Font and reading direction come from the dialog once the pill is added to it.
+        private void FitHeight()
         {
-            base.OnResize(e);
             int h = PreferredHeight(Width);
             if (h != Height) Height = h;
         }
@@ -180,7 +197,7 @@ namespace MiftawerkUnlock
                 g.DrawPath(border, p);
             }
 
-            float d = Font.Height * 1.05f;
+            int d = Dot;
             bool rtl = RightToLeft == RightToLeft.Yes;
             RectangleF dot = new RectangleF(rtl ? Width - Pad - d : Pad, Pad, d, d);
             using (SolidBrush b = new SolidBrush(c)) g.FillEllipse(b, dot);
@@ -189,9 +206,8 @@ namespace MiftawerkUnlock
             using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 g.DrawString(glyph, gf, Brushes.White, dot, sf);
 
-            Rectangle text = new Rectangle(rtl ? Pad : (int)(Pad * 2 + d), Pad, Width - Pad * 3 - (int)d, Height - Pad * 2);
-            TextFormatFlags flags = TextFormatFlags.WordBreak | (rtl ? TextFormatFlags.Right | TextFormatFlags.RightToLeft : 0);
-            TextRenderer.DrawText(g, Text, Font, text, Brand.Text, flags);
+            Rectangle text = new Rectangle(rtl ? Pad : Pad * 2 + d, Pad, TextWidth(Width), Height - Pad * 2);
+            TextRenderer.DrawText(g, Text, Font, text, Brand.Text, Flags);
         }
     }
 
