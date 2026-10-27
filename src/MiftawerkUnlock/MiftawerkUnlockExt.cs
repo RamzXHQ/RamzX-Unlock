@@ -64,6 +64,17 @@ namespace MiftawerkUnlock
             root.DropDownItems.Add(new ToolStripSeparator());
             AddItem(root, Strings.MenuSelfTest, OnSelfTestClick);
             AddItem(root, Strings.MenuDeleteSelfTest, OnDeleteClick);
+
+            // Brand line: RamzX logo and website.
+            root.DropDownItems.Add(new ToolStripSeparator());
+            ToolStripMenuItem about = new ToolStripMenuItem("RamzX · ramzx.de");
+            about.Image = Brand.MenuIcon(m_host.MainWindow);
+            about.Click += delegate
+            {
+                try { System.Diagnostics.Process.Start(Brand.Website); }
+                catch (Exception) { }
+            };
+            root.DropDownItems.Add(about);
             return root;
         }
 
