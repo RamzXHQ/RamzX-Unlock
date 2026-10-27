@@ -29,10 +29,17 @@ namespace MiftawerkUnlock
         private readonly IPluginHost m_host;
         // Path hashes whose next prompt must not be intercepted (after a failed quick unlock).
         private readonly HashSet<string> m_skipNext = new HashSet<string>();
+        // KeePass's main window handle, read on the UI thread. On KeePass's secure desktop the
+        // key prompt lives on another desktop; WebAuthn refuses an owner window there
+        // (RPC_E_ACCESS_DENIED, measured), but accepts the main window on the user's desktop.
+        private IntPtr m_mainHandle = IntPtr.Zero;
+        private const int RpcAccessDenied = unchecked((int)0x8001011B);
 
         internal QuickUnlock(IPluginHost host)
         {
             m_host = host;
+            if (host.MainWindow.IsHandleCreated) m_mainHandle = host.MainWindow.Handle;
+            else host.MainWindow.HandleCreated += delegate { m_mainHandle = host.MainWindow.Handle; };
         }
 
         internal void OnWindowAdded(object sender, GwmWindowEventArgs e)
@@ -110,7 +117,10 @@ namespace MiftawerkUnlock
                     // One prompt for all devices: Windows uses the passkey of the PC the user sits at.
                     List<KeyValuePair<byte[], byte[]>> ask = new List<KeyValuePair<byte[], byte[]>>();
                     foreach (UnlockRecord r in passkeys) ask.Add(new KeyValuePair<byte[], byte[]>(r.CredentialId, r.Challenge));
-                    PrfResult p = await WebAuthnPrf.GetSecretAsync(kpf.Handle, ask);
+                    IntPtr owner = kpf.SecureDesktopMode && m_mainHandle != IntPtr.Zero ? m_mainHandle : kpf.Handle;
+                    PrfResult p = await WebAuthnPrf.GetSecretAsync(owner, ask);
+                    if (p.Status == PrfStatus.Error && p.HResult == RpcAccessDenied && owner != IntPtr.Zero)
+                        p = await WebAuthnPrf.GetSecretAsync(IntPtr.Zero, ask); // no owner window at all
 
                     if (p.Status == PrfStatus.Success)
                     {
