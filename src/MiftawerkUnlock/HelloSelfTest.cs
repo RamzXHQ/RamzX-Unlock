@@ -47,6 +47,7 @@ namespace MiftawerkUnlock
                 Log(log, "IsSupported: " + supported);
                 Log(log, "WebAuthn API: " + WebAuthnPrf.ApiVersion() + ", passkey unlock available: " +
                     WebAuthnPrf.IsAvailable() + ", stored passkey: " + (RecordStore.TryLoadPasskeyId() != null));
+                LogRecordStatus(log, owner);
                 if (SystemInformation.TerminalServerSession)
                     Log(log, "Remote Desktop session: the Windows Hello key is not available over RDP; " +
                         "quick unlock uses a passkey on your local PC instead (WebAuthn redirection).");
@@ -298,6 +299,37 @@ namespace MiftawerkUnlock
             int diff = 0;
             for (int i = 0; i < a.Length; ++i) diff |= a[i] ^ b[i];
             return diff == 0;
+        }
+
+        /// <summary>
+        /// Quick-unlock state of the active (open or locked) database: is there a record, of which
+        /// kind, is it still valid - and settings that make KeePass skip quick unlock.
+        /// </summary>
+        private static void LogRecordStatus(StringBuilder log, Form owner)
+        {
+            try
+            {
+                Log(log, "Master key on secure desktop: " + KeePass.Program.Config.Security.MasterKeyOnSecureDesktop +
+                    " (quick unlock is skipped there)");
+                int files = System.IO.Directory.Exists(RecordStore.Directory)
+                    ? System.IO.Directory.GetFiles(RecordStore.Directory, "*.mwu").Length : 0;
+                Log(log, "Stored unlock records: " + files);
+
+                KeePass.Forms.MainForm mf = owner as KeePass.Forms.MainForm;
+                KeePass.UI.PwDocument doc = mf == null ? null : mf.DocumentManager.ActiveDocument;
+                KeePassLib.Serialization.IOConnectionInfo ioc = doc == null ? null
+                    : (doc.LockedIoc != null && !string.IsNullOrEmpty(doc.LockedIoc.Path) ? doc.LockedIoc
+                    : doc.Database != null ? doc.Database.IOConnectionInfo : null);
+                if (ioc == null || string.IsNullOrEmpty(ioc.Path)) { Log(log, "Active database: none"); return; }
+
+                Log(log, "Active database: local file " + ioc.IsLocalFile());
+                UnlockRecord rec = RecordStore.TryLoad(RecordStore.DbPathHash(ioc));
+                if (rec == null) { Log(log, "Record for active database: none"); return; }
+                Log(log, "Record for active database: " + rec.Kind + ", valid until " +
+                    rec.ExpiresUtc.ToLocalTime().ToString("g") + ", current: " + rec.IsCurrent(DateTime.UtcNow) +
+                    ", same boot: " + BootStamp.IsSameBoot(rec.BootTimeUtcTicks));
+            }
+            catch (Exception ex) { Log(log, "Record status: " + ex.GetType().Name + " " + ex.Message); }
         }
 
         private static void Log(StringBuilder log, string line)

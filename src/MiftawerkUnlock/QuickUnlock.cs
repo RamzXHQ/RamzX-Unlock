@@ -97,6 +97,12 @@ namespace MiftawerkUnlock
                     // Cancelled, passkey not on this client PC, or no secret: the user types the
                     // password. The record is kept - another client PC may be used next time.
                     PrfResult p = await WebAuthnPrf.GetSecretAsync(kpf.Handle, rec.CredentialId, rec.Challenge);
+                    if (p.Status == PrfStatus.Error || p.Status == PrfStatus.NoSecret)
+                    {
+                        Ui.Warn(kpf.IsDisposed ? (IWin32Window)m_host.MainWindow : kpf,
+                            Strings.Format(Strings.UnlockFailed, "WebAuthn " + p.Status + " 0x" + p.HResult.ToString("X8")));
+                        return;
+                    }
                     if (p.Status != PrfStatus.Success) return;
                     sig = p.Data;
                 }
