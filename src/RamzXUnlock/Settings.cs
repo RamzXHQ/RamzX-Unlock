@@ -64,6 +64,39 @@ namespace RamzXUnlock
             set { m_cfg.SetString(KeyLanguage, value ?? string.Empty); }
         }
 
+        private const string KeyDeclinedAnother = "RamzXUnlock.DeclinedAnotherDevice";
+        private const int MaxDeclined = 64;
+
+        /// <summary>
+        /// Databases (path hash, Base64) for which the user answered "Not now" to "also enable on this
+        /// computer?" – remembered across KeePass starts, so the question does not come back every time.
+        /// </summary>
+        internal bool IsAnotherDeviceDeclined(string id)
+        {
+            return Array.IndexOf(Declined(), id) >= 0;
+        }
+
+        internal void DeclineAnotherDevice(string id)
+        {
+            System.Collections.Generic.List<string> l = new System.Collections.Generic.List<string>(Declined());
+            if (l.Contains(id)) return;
+            l.Add(id);
+            if (l.Count > MaxDeclined) l.RemoveRange(0, l.Count - MaxDeclined);
+            m_cfg.SetString(KeyDeclinedAnother, string.Join(";", l.ToArray()));
+        }
+
+        /// <summary>"Forget all" also forgets these answers.</summary>
+        internal void ClearDeclined()
+        {
+            m_cfg.SetString(KeyDeclinedAnother, string.Empty);
+        }
+
+        private string[] Declined()
+        {
+            string s = m_cfg.GetString(KeyDeclinedAnother, string.Empty) ?? string.Empty;
+            return s.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
         internal static int ClampDays(long days)
         {
             if (days < MinValidityDays) return MinValidityDays;

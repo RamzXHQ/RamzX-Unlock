@@ -114,7 +114,7 @@ namespace RamzXUnlock
 
         private void OnForgetClick(object sender, EventArgs e)
         {
-            try { Ui.Info(m_host.MainWindow, Strings.Format(Strings.ForgetDone, RecordStore.DeleteAll())); }
+            try { m_settings.ClearDeclined(); Ui.Info(m_host.MainWindow, Strings.Format(Strings.ForgetDone, RecordStore.DeleteAll())); }
             catch (Exception ex) { Ui.Warn(m_host.MainWindow, Strings.Format(Strings.DeleteFailed, ex.Message)); }
         }
 

@@ -200,7 +200,7 @@ namespace RamzXUnlock
         private void OnForget(object sender, EventArgs e)
         {
             if (!Ui.Ask(this, Strings.Get(Strings.ForgetConfirm))) return;
-            try { Ui.Info(this, Strings.Format(Strings.ForgetDone, RecordStore.DeleteAll())); }
+            try { m_settings.ClearDeclined(); Ui.Info(this, Strings.Format(Strings.ForgetDone, RecordStore.DeleteAll())); }
             catch (Exception ex) { Ui.Warn(this, Strings.Format(Strings.DeleteFailed, ex.Message)); }
             UpdateUsage();
         }

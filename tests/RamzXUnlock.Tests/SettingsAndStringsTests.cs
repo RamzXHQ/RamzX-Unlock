@@ -69,6 +69,23 @@ namespace RamzXUnlock.Tests
             cfg.SetString("MiftawerkUnlock.Language", "klingon");
             Assert.Equal(string.Empty, new Settings(cfg).Language);
         }
+
+        [Fact]
+        public void AnotherDeviceDecline_IsRemembered_Bounded_AndCleared()
+        {
+            AceCustomConfig cfg = new AceCustomConfig();
+            Settings s = new Settings(cfg);
+            Assert.False(s.IsAnotherDeviceDeclined("db1"));
+            s.DeclineAnotherDevice("db1");
+            s.DeclineAnotherDevice("db1");
+            Assert.True(new Settings(cfg).IsAnotherDeviceDeclined("db1")); // survives a KeePass restart
+            Assert.False(s.IsAnotherDeviceDeclined("db2"));
+            for (int i = 0; i < 100; ++i) s.DeclineAnotherDevice("x" + i);
+            Assert.False(s.IsAnotherDeviceDeclined("db1"));                  // oldest dropped (max 64)
+            Assert.True(s.IsAnotherDeviceDeclined("x99"));
+            s.ClearDeclined();
+            Assert.False(s.IsAnotherDeviceDeclined("x99"));
+        }
     }
 
     public class BrandTests

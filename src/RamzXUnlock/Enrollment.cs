@@ -79,6 +79,9 @@ namespace RamzXUnlock
                     alreadyEnabled = true;
                 }
 
+                // "Also on this computer?" was answered "Not now" before: do not ask at every start
+                if (alreadyEnabled && m_settings.IsAnotherDeviceDeclined(id)) return;
+
                 TimeSpan validity = m_settings.Validity;
                 string question = alreadyEnabled
                     ? Strings.Format(Strings.EnrollAnotherDevice, db.IOConnectionInfo.GetDisplayName(), (int)validity.TotalDays)
@@ -86,6 +89,7 @@ namespace RamzXUnlock
                 if (!EnrollForm.Ask(owner, question))
                 {
                     m_declined.Add(id);
+                    if (alreadyEnabled) m_settings.DeclineAnotherDevice(id);
                     return;
                 }
 
