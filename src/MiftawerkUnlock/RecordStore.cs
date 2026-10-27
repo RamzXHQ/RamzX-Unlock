@@ -2,6 +2,7 @@
 // Copyright (c) 2026 RamzX. MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -43,11 +44,29 @@ namespace MiftawerkUnlock
             return RecordCrypto.Sha256(Encoding.UTF8.GetBytes(norm));
         }
 
-        private static string FileFor(byte[] dbPathHash)
+        private static string Hex(byte[] b, int count)
         {
-            StringBuilder sb = new StringBuilder(64);
-            foreach (byte b in dbPathHash) sb.Append(b.ToString("x2"));
-            return Path.Combine(Directory, sb + ".mwu");
+            StringBuilder sb = new StringBuilder(2 * count);
+            for (int i = 0; i < count && i < b.Length; ++i) sb.Append(b[i].ToString("x2"));
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// {sha256(path)}.mwu for the Windows Hello key record (one per database, as before);
+        /// {sha256(path)}-{sha256(passkey id)[0..8]}.mwu for passkey records (one per database and
+        /// device passkey, so a database can be quick-unlocked from several PCs).
+        /// </summary>
+        private static string FileFor(UnlockRecord r)
+        {
+            string name = Hex(r.DbPathHash, 32);
+            if (r.Kind == RecordKind.WebAuthnPrf) name += "-" + Hex(RecordCrypto.Sha256(r.CredentialId), 8);
+            return Path.Combine(Directory, name + ".mwu");
+        }
+
+        private static string[] FilesFor(byte[] dbPathHash)
+        {
+            if (!System.IO.Directory.Exists(Directory)) return new string[0];
+            return System.IO.Directory.GetFiles(Directory, Hex(dbPathHash, 32) + "*.mwu");
         }
 
         internal static void Save(UnlockRecord r)
@@ -56,33 +75,60 @@ namespace MiftawerkUnlock
             byte[] wrapped = ProtectedData.Protect(r.ToBytes(), DpapiEntropy,
                 DataProtectionScope.CurrentUser);
 
-            string target = FileFor(r.DbPathHash);
+            string target = FileFor(r);
             string tmp = target + ".tmp";
             File.WriteAllBytes(tmp, wrapped);
             if (File.Exists(target)) File.Replace(tmp, target, null);
             else File.Move(tmp, target);
         }
 
-        /// <summary>Returns null if there is no readable record for this database.</summary>
+        /// <summary>All readable records of this database (any kind, any device).</summary>
+        internal static List<UnlockRecord> LoadAll(byte[] dbPathHash)
+        {
+            List<UnlockRecord> list = new List<UnlockRecord>();
+            foreach (string f in FilesFor(dbPathHash))
+            {
+                UnlockRecord r = TryRead(f, dbPathHash);
+                if (r != null) list.Add(r);
+            }
+            return list;
+        }
+
+        /// <summary>The Windows Hello key record of this database, or null (kept for callers and tests).</summary>
         internal static UnlockRecord TryLoad(byte[] dbPathHash)
         {
-            string f = FileFor(dbPathHash);
-            if (!File.Exists(f)) return null;
+            List<UnlockRecord> all = LoadAll(dbPathHash);
+            foreach (UnlockRecord r in all) if (r.Kind == RecordKind.HelloKey) return r;
+            return all.Count > 0 ? all[0] : null;
+        }
+
+        private static UnlockRecord TryRead(string f, byte[] dbPathHash)
+        {
             try
             {
                 byte[] raw = ProtectedData.Unprotect(File.ReadAllBytes(f), DpapiEntropy,
                     DataProtectionScope.CurrentUser);
                 UnlockRecord r = UnlockRecord.FromBytes(raw);
-                return RecordCrypto.ConstantTimeEquals(r.DbPathHash, dbPathHash) ? r : null;
+                if (!RecordCrypto.ConstantTimeEquals(r.DbPathHash, dbPathHash)) return null;
+                r.SourceFile = f; // 0.4.0 stored its passkey record under the plain name
+                return r;
             }
             catch (CryptographicException) { return null; }
             catch (InvalidDataException) { return null; }
             catch (EndOfStreamException) { return null; }
+            catch (IOException) { return null; }
         }
 
+        /// <summary>Deletes every record of this database (all devices).</summary>
         internal static void Delete(byte[] dbPathHash)
         {
-            string f = FileFor(dbPathHash);
+            foreach (string f in FilesFor(dbPathHash)) File.Delete(f);
+        }
+
+        /// <summary>Deletes one record (e.g. an expired one), keeps the others.</summary>
+        internal static void Delete(UnlockRecord r)
+        {
+            string f = r.SourceFile ?? FileFor(r);
             if (File.Exists(f)) File.Delete(f);
         }
 
@@ -90,28 +136,70 @@ namespace MiftawerkUnlock
 
         private static string PasskeyFile { get { return Path.Combine(Directory, "passkey.id"); } }
 
+        private static readonly byte[] PasskeyListMagic = Encoding.ASCII.GetBytes("PKL1");
+        private const int MaxPasskeys = 32;
+
         /// <summary>
-        /// Credential ID of the passkey created for WebAuthn quick unlock, or null. Not secret
-        /// (the secret stays in Windows Hello of the client PC); kept DPAPI-wrapped anyway.
+        /// Credential IDs of the passkeys created for quick unlock (one per device the user works
+        /// from), newest last. Not secret (the secrets stay in Windows Hello of each device);
+        /// kept DPAPI-wrapped anyway. Reads the single-ID file of 0.4.0 as a list of one.
         /// </summary>
-        internal static byte[] TryLoadPasskeyId()
+        internal static List<byte[]> LoadPasskeyIds()
         {
+            List<byte[]> ids = new List<byte[]>();
             try
             {
-                if (!File.Exists(PasskeyFile)) return null;
-                byte[] id = ProtectedData.Unprotect(File.ReadAllBytes(PasskeyFile), DpapiEntropy,
+                if (!File.Exists(PasskeyFile)) return ids;
+                byte[] raw = ProtectedData.Unprotect(File.ReadAllBytes(PasskeyFile), DpapiEntropy,
                     DataProtectionScope.CurrentUser);
-                return id.Length > 0 && id.Length <= 1024 ? id : null;
+                if (raw.Length >= 4 && RecordCrypto.ConstantTimeEquals(Sub(raw, 0, 4), PasskeyListMagic))
+                {
+                    using (BinaryReader rd = new BinaryReader(new MemoryStream(raw, 4, raw.Length - 4)))
+                    {
+                        int n = rd.ReadByte();
+                        for (int i = 0; i < n && i < MaxPasskeys; ++i)
+                        {
+                            int len = rd.ReadUInt16();
+                            if (len == 0 || len > 1024) break;
+                            byte[] id = rd.ReadBytes(len);
+                            if (id.Length != len) break;
+                            ids.Add(id);
+                        }
+                    }
+                }
+                else if (raw.Length > 0 && raw.Length <= 1024) ids.Add(raw); // 0.4.0: one raw ID
             }
-            catch (CryptographicException) { return null; }
-            catch (IOException) { return null; }
+            catch (CryptographicException) { }
+            catch (IOException) { }
+            return ids;
         }
 
-        internal static void SavePasskeyId(byte[] credentialId)
+        /// <summary>Adds a passkey to the list (kept unique; the oldest are dropped beyond 32).</summary>
+        internal static void AddPasskeyId(byte[] credentialId)
         {
-            System.IO.Directory.CreateDirectory(Directory);
-            File.WriteAllBytes(PasskeyFile, ProtectedData.Protect(credentialId, DpapiEntropy,
-                DataProtectionScope.CurrentUser));
+            List<byte[]> ids = LoadPasskeyIds();
+            ids.RemoveAll(x => RecordCrypto.ConstantTimeEquals(x, credentialId));
+            ids.Add(credentialId);
+            while (ids.Count > MaxPasskeys) ids.RemoveAt(0);
+
+            using (MemoryStream ms = new MemoryStream())
+            using (BinaryWriter w = new BinaryWriter(ms))
+            {
+                w.Write(PasskeyListMagic);
+                w.Write((byte)ids.Count);
+                foreach (byte[] id in ids) { w.Write((ushort)id.Length); w.Write(id); }
+                w.Flush();
+                System.IO.Directory.CreateDirectory(Directory);
+                File.WriteAllBytes(PasskeyFile, ProtectedData.Protect(ms.ToArray(), DpapiEntropy,
+                    DataProtectionScope.CurrentUser));
+            }
+        }
+
+        private static byte[] Sub(byte[] b, int start, int count)
+        {
+            byte[] r = new byte[count];
+            Buffer.BlockCopy(b, start, r, 0, count);
+            return r;
         }
 
         /// <returns>Number of deleted records.</returns>

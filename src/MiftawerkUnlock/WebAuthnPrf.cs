@@ -26,12 +26,14 @@ namespace MiftawerkUnlock
         internal readonly PrfStatus Status;
         internal readonly int HResult;
         internal readonly byte[] Data; // credential ID (create) or 32-byte secret (get)
+        internal readonly byte[] CredentialId; // get: the passkey Windows used
 
-        internal PrfResult(PrfStatus status, int hr, byte[] data)
+        internal PrfResult(PrfStatus status, int hr, byte[] data, byte[] credentialId = null)
         {
             Status = status;
             HResult = hr;
             Data = data;
+            CredentialId = credentialId;
         }
     }
 
@@ -90,9 +92,25 @@ namespace MiftawerkUnlock
         /// <summary>Asks Windows Hello for the PRF value of <paramref name="salt"/>. Data = 32-byte secret.</summary>
         internal static Task<PrfResult> GetSecretAsync(IntPtr owner, byte[] credentialId, byte[] salt)
         {
-            if (credentialId == null || credentialId.Length == 0) throw new ArgumentException("No credential.", "credentialId");
-            if (salt == null || salt.Length != SecretLength) throw new ArgumentException("Salt must be 32 bytes.", "salt");
-            return Task.Run(() => GetSecret(owner, (byte[])credentialId.Clone(), (byte[])salt.Clone()));
+            return GetSecretAsync(owner, new[] { new KeyValuePair<byte[], byte[]>(credentialId, salt) });
+        }
+
+        /// <summary>
+        /// One Windows Hello prompt for several passkeys (e.g. one per device the user works from),
+        /// each with its own salt. Windows uses the passkey that is present on the PC the user
+        /// sits at. Data = 32-byte secret; <see cref="PrfResult.CredentialId"/> = the passkey used.
+        /// </summary>
+        internal static Task<PrfResult> GetSecretAsync(IntPtr owner, IList<KeyValuePair<byte[], byte[]>> credentialsAndSalts)
+        {
+            if (credentialsAndSalts == null || credentialsAndSalts.Count == 0) throw new ArgumentException("No credential.", "credentialsAndSalts");
+            List<KeyValuePair<byte[], byte[]>> copy = new List<KeyValuePair<byte[], byte[]>>();
+            foreach (KeyValuePair<byte[], byte[]> cs in credentialsAndSalts)
+            {
+                if (cs.Key == null || cs.Key.Length == 0) throw new ArgumentException("No credential.", "credentialsAndSalts");
+                if (cs.Value == null || cs.Value.Length != SecretLength) throw new ArgumentException("Salt must be 32 bytes.", "credentialsAndSalts");
+                copy.Add(new KeyValuePair<byte[], byte[]>((byte[])cs.Key.Clone(), (byte[])cs.Value.Clone()));
+            }
+            return Task.Run(() => GetSecret(owner, copy));
         }
 
         internal static PrfStatus Classify(int hr)
@@ -153,24 +171,36 @@ namespace MiftawerkUnlock
             }
         }
 
-        private static PrfResult GetSecret(IntPtr owner, byte[] credentialId, byte[] salt)
+        private static PrfResult GetSecret(IntPtr owner, List<KeyValuePair<byte[], byte[]>> credentialsAndSalts)
         {
             using (Unmanaged mem = new Unmanaged())
             {
                 try
                 {
-                    Credential cred = new Credential
+                    int n = credentialsAndSalts.Count;
+                    int credSize = Marshal.SizeOf(typeof(Credential)), withSaltSize = Marshal.SizeOf(typeof(CredWithSalt));
+                    IntPtr creds = mem.Alloc(n * credSize), withSalts = mem.Alloc(n * withSaltSize);
+                    IntPtr type = mem.String("public-key");
+                    for (int i = 0; i < n; ++i)
                     {
-                        dwVersion = 1, cbId = (uint)credentialId.Length, pbId = mem.Bytes(credentialId),
-                        pwszCredentialType = mem.String("public-key")
-                    };
-                    HmacSalt s = new HmacSalt { cbFirst = (uint)salt.Length, pbFirst = mem.Bytes(salt) };
-                    HmacSaltValues sv = new HmacSaltValues { pGlobalHmacSalt = mem.Struct(s) };
+                        byte[] id = credentialsAndSalts[i].Key, salt = credentialsAndSalts[i].Value;
+                        IntPtr pId = mem.Bytes(id);
+                        Marshal.StructureToPtr(new Credential { dwVersion = 1, cbId = (uint)id.Length, pbId = pId, pwszCredentialType = type },
+                            creds + i * credSize, false);
+                        IntPtr pSalt = mem.Struct(new HmacSalt { cbFirst = (uint)salt.Length, pbFirst = mem.Bytes(salt) });
+                        Marshal.StructureToPtr(new CredWithSalt { cbCredID = (uint)id.Length, pbCredID = pId, pHmacSecretSalt = pSalt },
+                            withSalts + i * withSaltSize, false);
+                    }
+                    // One passkey: global salt (measured over RDP). Several: per-credential salts,
+                    // each passkey gets the salt of its own record.
+                    HmacSaltValues sv = n == 1
+                        ? new HmacSaltValues { pGlobalHmacSalt = Marshal.ReadIntPtr(withSalts, (int)Marshal.OffsetOf(typeof(CredWithSalt), "pHmacSecretSalt")) }
+                        : new HmacSaltValues { cCredWithHmacSecretSaltList = (uint)n, pCredWithHmacSecretSaltList = withSalts };
                     GetOptions opt = new GetOptions
                     {
                         dwVersion = 6, // up to pHmacSecretSaltValues
                         dwTimeoutMilliseconds = TimeoutMs,
-                        CredentialList = new Credentials { cCredentials = 1, pCredentials = mem.Struct(cred) },
+                        CredentialList = new Credentials { cCredentials = (uint)n, pCredentials = creds },
                         dwUserVerificationRequirement = 1,
                         pHmacSecretSaltValues = mem.Struct(sv)
                     };
@@ -183,14 +213,18 @@ namespace MiftawerkUnlock
                     {
                         if (Marshal.ReadInt32(pAssertion) < 3) return new PrfResult(PrfStatus.NoSecret, 0, null);
                         AssertionPrefix a = (AssertionPrefix)Marshal.PtrToStructure(pAssertion, typeof(AssertionPrefix));
-                        if (a.pHmacSecret == IntPtr.Zero) return new PrfResult(PrfStatus.NoSecret, 0, null);
+                        byte[] used = Copy(a.Credential.pbId, (int)a.Credential.cbId);
+                        if (a.pHmacSecret == IntPtr.Zero) return new PrfResult(PrfStatus.NoSecret, 0, null, used);
                         HmacSalt outSalt = (HmacSalt)Marshal.PtrToStructure(a.pHmacSecret, typeof(HmacSalt));
-                        if (outSalt.cbFirst != SecretLength) return new PrfResult(PrfStatus.NoSecret, 0, null);
-                        return new PrfResult(PrfStatus.Success, 0, Copy(outSalt.pbFirst, SecretLength));
+                        if (outSalt.cbFirst != SecretLength) return new PrfResult(PrfStatus.NoSecret, 0, null, used);
+                        return new PrfResult(PrfStatus.Success, 0, Copy(outSalt.pbFirst, SecretLength), used);
                     }
                     finally { Native.WebAuthNFreeAssertion(pAssertion); }
                 }
-                finally { Array.Clear(salt, 0, salt.Length); }
+                finally
+                {
+                    foreach (KeyValuePair<byte[], byte[]> cs in credentialsAndSalts) Array.Clear(cs.Value, 0, cs.Value.Length);
+                }
             }
         }
 
@@ -295,6 +329,9 @@ namespace MiftawerkUnlock
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct HmacSalt { public uint cbFirst; public IntPtr pbFirst; public uint cbSecond; public IntPtr pbSecond; }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct CredWithSalt { public uint cbCredID; public IntPtr pbCredID; public IntPtr pHmacSecretSalt; }
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct HmacSaltValues

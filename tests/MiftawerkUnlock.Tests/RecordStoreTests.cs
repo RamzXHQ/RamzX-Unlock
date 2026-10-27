@@ -156,6 +156,80 @@ namespace MiftawerkUnlock.Tests
             Assert.Equal(0, RecordStore.DeleteAll());
         }
 
+        private static UnlockRecord NewPasskeyRecord(byte[] pathHash, byte[] credId, byte[] prf)
+        {
+            return UnlockRecord.SealPrf(credId, pathHash, TimeSpan.FromDays(7), RecordCrypto.RandomBytes(32),
+                prf, Encoding.UTF8.GetBytes("payload"));
+        }
+
+        [Fact]
+        public void SeveralDevices_PerDatabase()
+        {
+            byte[] hash = RecordCrypto.RandomBytes(32), sig = RecordCrypto.RandomBytes(256);
+            byte[] idA = RecordCrypto.RandomBytes(32), idB = RecordCrypto.RandomBytes(32), prf = RecordCrypto.RandomBytes(32);
+            RecordStore.Save(NewRecord(hash, sig));
+            RecordStore.Save(NewPasskeyRecord(hash, idA, prf));
+            RecordStore.Save(NewPasskeyRecord(hash, idB, prf));
+            RecordStore.Save(NewPasskeyRecord(hash, idB, prf)); // same device again: replaces
+            RecordStore.Save(NewPasskeyRecord(RecordCrypto.RandomBytes(32), idA, prf)); // other database
+
+            var all = RecordStore.LoadAll(hash);
+            Assert.Equal(3, all.Count);
+            Assert.Equal(RecordKind.HelloKey, RecordStore.TryLoad(hash).Kind);
+            Assert.Equal(2, all.FindAll(r => r.Kind == RecordKind.WebAuthnPrf).Count);
+
+            RecordStore.Delete(all.Find(r => r.Kind == RecordKind.WebAuthnPrf && RecordCrypto.ConstantTimeEquals(r.CredentialId, idA)));
+            Assert.Equal(2, RecordStore.LoadAll(hash).Count);
+
+            RecordStore.Delete(hash); // all devices of this database
+            Assert.Empty(RecordStore.LoadAll(hash));
+            Assert.Equal(1, RecordStore.DeleteAll()); // the other database
+        }
+
+        [Fact]
+        public void PasskeyRecordOf040_UnderThePlainName_IsReadAndDeleted()
+        {
+            // 0.4.0 saved its passkey record as {hash}.mwu (like the Windows Hello key record).
+            byte[] hash = RecordCrypto.RandomBytes(32), id = RecordCrypto.RandomBytes(32), prf = RecordCrypto.RandomBytes(32);
+            UnlockRecord r = NewPasskeyRecord(hash, id, prf);
+            StringBuilder name = new StringBuilder();
+            foreach (byte b in hash) name.Append(b.ToString("x2"));
+            Directory.CreateDirectory(RecordStore.Directory);
+            string legacy = Path.Combine(RecordStore.Directory, name + ".mwu");
+            File.WriteAllBytes(legacy, ProtectedData.Protect(r.ToBytes(),
+                Encoding.ASCII.GetBytes("SeeColors.MiftawerkUnlock.Store.v1"), DataProtectionScope.CurrentUser));
+
+            UnlockRecord loaded = RecordStore.LoadAll(hash).Find(x => x.Kind == RecordKind.WebAuthnPrf);
+            Assert.NotNull(loaded);
+            Assert.Equal(Encoding.UTF8.GetBytes("payload"), loaded.Open(prf));
+            RecordStore.Delete(loaded);
+            Assert.False(File.Exists(legacy));
+        }
+
+        [Fact]
+        public void PasskeyList_KeepsOrder_Unique_AndReads040File()
+        {
+            Assert.Empty(RecordStore.LoadPasskeyIds());
+
+            // 0.4.0 wrote one raw credential ID.
+            byte[] old = RecordCrypto.RandomBytes(32);
+            Directory.CreateDirectory(RecordStore.Directory);
+            File.WriteAllBytes(Path.Combine(RecordStore.Directory, "passkey.id"), ProtectedData.Protect(old,
+                Encoding.ASCII.GetBytes("SeeColors.MiftawerkUnlock.Store.v1"), DataProtectionScope.CurrentUser));
+            Assert.Equal(old, Assert.Single(RecordStore.LoadPasskeyIds()));
+
+            byte[] b = RecordCrypto.RandomBytes(48);
+            RecordStore.AddPasskeyId(b);
+            RecordStore.AddPasskeyId(old); // again: moves to the end, no duplicate
+            var ids = RecordStore.LoadPasskeyIds();
+            Assert.Equal(2, ids.Count);
+            Assert.Equal(b, ids[0]);
+            Assert.Equal(old, ids[1]);
+
+            for (int i = 0; i < 40; ++i) RecordStore.AddPasskeyId(RecordCrypto.RandomBytes(16));
+            Assert.Equal(32, RecordStore.LoadPasskeyIds().Count);
+        }
+
         [Fact]
         public void DefaultDirectory_IsUnderLocalAppData()
         {

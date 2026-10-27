@@ -53,6 +53,9 @@ namespace MiftawerkUnlock
         internal byte[] DbPathHash { get; private set; }
         internal byte[] Challenge { get; private set; }
 
+        /// <summary>File the record was read from (not part of the record; set by RecordStore).</summary>
+        internal string SourceFile { get; set; }
+
         private byte[] m_salt, m_iv, m_cipher, m_mac;
 
         private UnlockRecord() { }

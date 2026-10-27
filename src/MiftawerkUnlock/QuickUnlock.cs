@@ -45,23 +45,29 @@ namespace MiftawerkUnlock
             byte[] pathHash = RecordStore.DbPathHash(ioc);
             if (m_skipNext.Remove(Convert.ToBase64String(pathHash))) return;
 
-            UnlockRecord rec = RecordStore.TryLoad(pathHash);
-            if (rec == null) return;
-            // The Windows Hello key does not work over Remote Desktop (H12); passkey records
-            // (WebAuthn PRF) do, through WebAuthn redirection to the PC the user sits at.
-            if (rec.Kind == RecordKind.HelloKey && SystemInformation.TerminalServerSession) return;
-            // On KeePass's secure desktop a local Windows Hello dialog would not be visible (H14).
-            // Over Remote Desktop the passkey prompt is shown on the user's own PC instead, so the
-            // secure desktop of this computer does not hide it.
-            if (kpf.SecureDesktopMode &&
-                !(rec.Kind == RecordKind.WebAuthnPrf && SystemInformation.TerminalServerSession)) return;
-            if (!rec.IsCurrent(DateTime.UtcNow))
+            List<UnlockRecord> usable = new List<UnlockRecord>();
+            DateTime now = DateTime.UtcNow;
+            foreach (UnlockRecord r in RecordStore.LoadAll(pathHash))
             {
-                RecordStore.Delete(pathHash); // expired or Windows restarted
-                return;
+                if (!r.IsCurrent(now)) { RecordStore.Delete(r); continue; } // expired or Windows restarted
+                if (CanUseHere(r, kpf.SecureDesktopMode)) usable.Add(r);
             }
+            if (usable.Count == 0) return;
 
-            kpf.Shown += delegate { kpf.BeginInvoke(new Action(() => Run(kpf, ioc, rec))); };
+            kpf.Shown += delegate { kpf.BeginInvoke(new Action(() => Run(kpf, ioc, usable))); };
+        }
+
+        /// <summary>
+        /// Windows Hello key records need this PC's own Windows Hello: not over Remote Desktop (H12)
+        /// and not on KeePass's secure desktop, where its dialog would be hidden (H14).
+        /// Passkey records work locally and over Remote Desktop (the prompt then appears on the
+        /// user's own PC, so the remote secure desktop does not hide it).
+        /// </summary>
+        private static bool CanUseHere(UnlockRecord r, bool secureDesktop)
+        {
+            bool remote = SystemInformation.TerminalServerSession;
+            if (r.Kind == RecordKind.HelloKey) return !remote && !secureDesktop;
+            return remote || !secureDesktop;
         }
 
         /// <summary>
@@ -89,32 +95,50 @@ namespace MiftawerkUnlock
             return null;
         }
 
-        private async void Run(KeyPromptForm kpf, IOConnectionInfo ioc, UnlockRecord rec)
+        private async void Run(KeyPromptForm kpf, IOConnectionInfo ioc, List<UnlockRecord> usable)
         {
             byte[] sig = null, plain = null;
             KeySnapshot snap = null;
+            UnlockRecord rec = null;
             try
             {
-                if (rec.Kind == RecordKind.WebAuthnPrf)
+                List<UnlockRecord> passkeys = usable.FindAll(r => r.Kind == RecordKind.WebAuthnPrf);
+                UnlockRecord hello = usable.Find(r => r.Kind == RecordKind.HelloKey);
+
+                if (passkeys.Count > 0)
                 {
-                    // Cancelled, passkey not on this client PC, or no secret: the user types the
-                    // password. The record is kept - another client PC may be used next time.
-                    PrfResult p = await WebAuthnPrf.GetSecretAsync(kpf.Handle, rec.CredentialId, rec.Challenge);
-                    if (p.Status == PrfStatus.Error || p.Status == PrfStatus.NoSecret)
+                    // One prompt for all devices: Windows uses the passkey of the PC the user sits at.
+                    List<KeyValuePair<byte[], byte[]>> ask = new List<KeyValuePair<byte[], byte[]>>();
+                    foreach (UnlockRecord r in passkeys) ask.Add(new KeyValuePair<byte[], byte[]>(r.CredentialId, r.Challenge));
+                    PrfResult p = await WebAuthnPrf.GetSecretAsync(kpf.Handle, ask);
+
+                    if (p.Status == PrfStatus.Success)
                     {
-                        Ui.Warn(kpf.IsDisposed ? (IWin32Window)m_host.MainWindow : kpf,
-                            Strings.Format(Strings.UnlockFailed, "WebAuthn " + p.Status + " 0x" + p.HResult.ToString("X8")));
-                        return;
+                        rec = passkeys.Find(r => p.CredentialId != null && RecordCrypto.ConstantTimeEquals(r.CredentialId, p.CredentialId));
+                        if (rec == null) { Array.Clear(p.Data, 0, p.Data.Length); return; }
+                        sig = p.Data;
                     }
-                    if (p.Status != PrfStatus.Success) return;
-                    sig = p.Data;
+                    else if (p.Status == PrfStatus.Cancelled) return; // the user types the password
+                    else if (p.Status == PrfStatus.Error || p.Status == PrfStatus.NoSecret)
+                    {
+                        if (hello == null)
+                        {
+                            Ui.Warn(kpf.IsDisposed ? (IWin32Window)m_host.MainWindow : kpf,
+                                Strings.Format(Strings.UnlockFailed, "WebAuthn " + p.Status + " 0x" + p.HResult.ToString("X8")));
+                            return;
+                        }
+                    }
+                    // NotFound (no linked passkey on this PC): try the Windows Hello key below, if any.
                 }
-                else
+
+                if (sig == null)
                 {
+                    if (hello == null) return; // records are kept: another device may be used next time
+                    rec = hello;
                     KeyCredentialRetrievalResult kr = await KeyCredentialManager.OpenAsync(HelloKey.CredentialName);
                     if (kr.Status == KeyCredentialStatus.NotFound)
                     {
-                        RecordStore.Delete(rec.DbPathHash); // Windows Hello was reset
+                        RecordStore.Delete(rec); // Windows Hello was reset
                         return;
                     }
                     if (kr.Status != KeyCredentialStatus.Success) return;
@@ -129,7 +153,7 @@ namespace MiftawerkUnlock
                 try { plain = rec.Open(sig); }
                 catch (CryptographicException)
                 {
-                    RecordStore.Delete(rec.DbPathHash);
+                    RecordStore.Delete(rec);
                     return;
                 }
                 snap = KeySnapshot.Deserialize(plain);

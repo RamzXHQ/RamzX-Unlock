@@ -43,7 +43,7 @@ KeePass is **locked when you lock Windows**.
 | 🛟 **Fail-safe** | Cancel or any error → the normal master password prompt |
 | 🌍 **Any Windows language** | The Windows Hello dialog is brought to the front independent of language |
 | 🚫 **No telemetry** | No network access, no data collection |
-| 🖥️ **Works over Remote Desktop** | KeePass on another computer opens with the face or fingerprint of the PC you sit at (Windows Hello passkey via WebAuthn redirection, Windows 11 22H2+ on the remote computer) |
+| 🖥️ **Same method everywhere** | One Windows Hello confirmation at this computer **and** over Remote Desktop: a passkey in Windows Hello of the PC you sit at. Several devices can be linked to one database; Windows picks the one in front of you. Older Windows: automatic fallback |
 | 🧩 **Works with RamzX OTP** | Other plugins can ask for Windows Hello through a small public API, e.g. [RamzX OTP](https://github.com/RamzXHQ/RamzX-OTP) before copying one-time codes |
 
 ## Screenshots

@@ -46,7 +46,7 @@ namespace MiftawerkUnlock
                 bool supported = await KeyCredentialManager.IsSupportedAsync();
                 Log(log, "IsSupported: " + supported);
                 Log(log, "WebAuthn API: " + WebAuthnPrf.ApiVersion() + ", passkey unlock available: " +
-                    WebAuthnPrf.IsAvailable() + ", stored passkey: " + (RecordStore.TryLoadPasskeyId() != null));
+                    WebAuthnPrf.IsAvailable() + ", linked passkeys: " + RecordStore.LoadPasskeyIds().Count);
                 LogRecordStatus(log, owner);
                 if (SystemInformation.TerminalServerSession)
                     Log(log, "Remote Desktop session: the Windows Hello key is not available over RDP; " +
@@ -323,11 +323,12 @@ namespace MiftawerkUnlock
                 if (ioc == null || string.IsNullOrEmpty(ioc.Path)) { Log(log, "Active database: none"); return; }
 
                 Log(log, "Active database: local file " + ioc.IsLocalFile());
-                UnlockRecord rec = RecordStore.TryLoad(RecordStore.DbPathHash(ioc));
-                if (rec == null) { Log(log, "Record for active database: none"); return; }
-                Log(log, "Record for active database: " + rec.Kind + ", valid until " +
-                    rec.ExpiresUtc.ToLocalTime().ToString("g") + ", current: " + rec.IsCurrent(DateTime.UtcNow) +
-                    ", same boot: " + BootStamp.IsSameBoot(rec.BootTimeUtcTicks));
+                List<UnlockRecord> recs = RecordStore.LoadAll(RecordStore.DbPathHash(ioc));
+                if (recs.Count == 0) { Log(log, "Records for active database: none"); return; }
+                foreach (UnlockRecord rec in recs)
+                    Log(log, "Record for active database: " + rec.Kind + ", valid until " +
+                        rec.ExpiresUtc.ToLocalTime().ToString("g") + ", current: " + rec.IsCurrent(DateTime.UtcNow) +
+                        ", same boot: " + BootStamp.IsSameBoot(rec.BootTimeUtcTicks));
             }
             catch (Exception ex) { Log(log, "Record status: " + ex.GetType().Name + " " + ex.Message); }
         }
