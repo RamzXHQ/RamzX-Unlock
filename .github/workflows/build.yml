@@ -46,12 +46,12 @@ jobs:
 
       - name: Build
         shell: pwsh
-        run: dotnet build src/MiftawerkUnlock/MiftawerkUnlock.csproj -c Release "/p:KeePassDir=$env:KEEPASS_DIR"
+        run: dotnet build src/RamzXUnlock/RamzXUnlock.csproj -c Release "/p:KeePassDir=$env:KEEPASS_DIR"
 
       - name: Test
         shell: pwsh
         run: >
-          dotnet test tests/MiftawerkUnlock.Tests/MiftawerkUnlock.Tests.csproj -c Release
+          dotnet test tests/RamzXUnlock.Tests/RamzXUnlock.Tests.csproj -c Release
           "/p:KeePassDir=$env:KEEPASS_DIR"
           --collect:"XPlat Code Coverage" --results-directory "$env:RUNNER_TEMP/coverage"
 
@@ -63,9 +63,9 @@ jobs:
       - name: Upload plugin
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: MiftawerkUnlock
+          name: RamzXUnlock
           path: |
-            src/MiftawerkUnlock/bin/Release/net48/MiftawerkUnlock.dll
+            src/RamzXUnlock/bin/Release/net48/RamzXUnlock.dll
             LICENSE
             README.md
           if-no-files-found: error

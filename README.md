@@ -147,7 +147,7 @@ RamzX Unlock is written from scratch; no code was copied from other projects.
 Requires the .NET SDK (no Visual Studio needed):
 
 ```
-dotnet build src/MiftawerkUnlock/MiftawerkUnlock.csproj -c Release
+dotnet build src/RamzXUnlock/RamzXUnlock.csproj -c Release
 ```
 
 The build references `KeePass.exe` from `testenv/KeePass/` (a portable KeePass copy that is
@@ -159,7 +159,7 @@ Free code signing provided by [SignPath.io](https://about.signpath.io),
 certificate by [SignPath Foundation](https://signpath.org).
 *(Application in progress – current releases are not signed yet.)*
 
-- **What is signed:** only `MiftawerkUnlock.dll`, built automatically by
+- **What is signed:** only `RamzXUnlock.dll`, built automatically by
   [GitHub Actions](.github/workflows/build.yml) from the tagged source code in this repository.
   Third-party components are not signed by this project.
 - **Committers and reviewers:** [members of the RamzX organization](https://github.com/orgs/RamzXHQ/people)

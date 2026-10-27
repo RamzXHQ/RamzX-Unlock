@@ -8,11 +8,11 @@ if (-not $file) { throw "No coverage.cobertura.xml found in $ResultsDir" }
 
 # Classes that need Windows Hello hardware or the KeePass UI cannot run on a CI runner.
 $uiClasses = 'Enrollment', 'HelloForeground', 'HelloKey', 'SignResult', 'HelloSelfTest',
-    'MiftawerkUnlockExt', 'QuickUnlock', 'WindowsLockWatcher', 'NativeMethods', 'SettingsForm', 'Ui'
+    'RamzXUnlockExt', 'QuickUnlock', 'WindowsLockWatcher', 'NativeMethods', 'SettingsForm', 'Ui'
 
 $xml = [xml](Get-Content $file.FullName)
 $rows = $xml.coverage.packages.package.classes.class |
-    Group-Object { (($_.name -split '[+/<]')[0]) -replace '^MiftawerkUnlock\.', '' } |
+    Group-Object { (($_.name -split '[+/<]')[0]) -replace '^RamzXUnlock\.', '' } |
     ForEach-Object {
         $lines = @($_.Group | ForEach-Object { $_.lines.line })
         $hit = @($lines | Where-Object { [int]$_.hits -gt 0 }).Count
