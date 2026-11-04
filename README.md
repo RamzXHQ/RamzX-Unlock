@@ -42,7 +42,7 @@ KeePass is **locked when you lock Windows**.
 | 💾 **Never writes your .kdbx** | Your database file is not modified by the plugin |
 | 🛟 **Fail-safe** | Cancel or any error → the normal master password prompt |
 | 🌍 **Any Windows language** | The Windows Hello dialog is brought to the front independent of language |
-| 🚫 **No telemetry** | No network access, no data collection |
+| 🚫 **No telemetry** | The plugin makes no network connections, no data collection |
 | 🖥️ **Same method everywhere** | One Windows Hello confirmation at this computer **and** over Remote Desktop: a passkey in Windows Hello of the PC you sit at. Several devices can be linked to one database; Windows picks the one in front of you. Older Windows: automatic fallback |
 | 🧩 **Works with RamzX OTP** | Other plugins can ask for Windows Hello through a small public API, e.g. [RamzX OTP](https://github.com/RamzXHQ/RamzX-OTP) before copying one-time codes |
 
@@ -113,7 +113,8 @@ Windows 11 Smart App Control blocks unsigned DLLs. Signed releases are planned
 ## Privacy (GDPR / DSGVO)
 
 - No biometric data reaches the plugin; recognition happens inside Windows Hello.
-- No telemetry, no network connections, no accounts.
+- No telemetry, no network connections of the plugin, no accounts.
+- Update check: only KeePass's own update check (Help → Check for Updates, or RamzX Update) reads the signed file `https://ramzx.de/plugins/version.txt` (name and version of each RamzX plugin; KeePass refuses it unless the RamzX signature matches). This technically transmits your IP address and the time, nothing else.
 - All data stays on your PC, encrypted, under your Windows user.
 
 ## Security notes

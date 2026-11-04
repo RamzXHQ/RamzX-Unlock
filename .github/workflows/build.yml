@@ -60,6 +60,17 @@ jobs:
         shell: pwsh
         run: ./build/coverage-summary.ps1 "$env:RUNNER_TEMP/coverage" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
+      - name: Tag matches the plugin version (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $want = $env:GITHUB_REF_NAME.Substring(1)
+          foreach ($f in Get-ChildItem src -Recurse -Filter 'RamzX*.dll' | Where-Object FullName -like '*\bin\Release\net48\*') {
+            $v = [Version](Get-Item $f.FullName).VersionInfo.FileVersion
+            $have = '{0}.{1}.{2}' -f $v.Major, $v.Minor, $v.Build
+            if ($have -ne $want) { throw "$($f.Name) is $have, tag is $env:GITHUB_REF_NAME" }
+          }
+
       - name: Upload plugin
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -69,3 +80,42 @@ jobs:
             LICENSE
             README.md
           if-no-files-found: error
+
+  # A tag vX.Y.Z builds on GitHub's runners and uploads the plugin as a DRAFT release (GitHub API): nobody sees it
+  # until the owner checks and publishes it. The signed version file (ramzx.de/plugins/version.txt) is made on the
+  # release machine afterwards (RamzX Tools: tools/Sign-VersionFile.ps1) - the private key never goes to GitHub.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write      # create the draft release
+      id-token: write      # Sigstore signing of the build provenance
+      attestations: write
+    steps:
+      - name: Plugin files from the build job
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: RamzXUnlock
+          path: build-output
+
+      - name: Collect files and checksums
+        run: |
+          mkdir dist
+          find build-output -name 'RamzX*.dll' -exec cp {} dist/ \;
+          cp build-output/LICENSE build-output/README.md dist/ 2>/dev/null || true
+          cd dist && sha256sum *.dll > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - name: Build provenance (public repositories)
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/*.dll
+
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* --draft --verify-tag --repo "$GITHUB_REPOSITORY" \
+            --title "RamzX Unlock ${GITHUB_REF_NAME#v}" \
+            --notes "Copy the DLL file(s) into the Plugins folder of KeePass (2.60 or newer) and restart KeePass. Checksums: SHA256SUMS.txt."

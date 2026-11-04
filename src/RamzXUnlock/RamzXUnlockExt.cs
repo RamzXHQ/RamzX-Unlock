@@ -21,11 +21,14 @@ namespace RamzXUnlock
         private QuickUnlock m_quickUnlock;
         private WindowsLockWatcher m_lockWatcher;
 
+        public override string UpdateUrl { get { return UpdateInfo.Url; } }
+
         public override bool Initialize(IPluginHost host)
         {
             if (host == null) return false;
             m_host = host;
 
+            UpdateInfo.Register();
             m_settings = new Settings(host.CustomConfig);
             Strings.Select(Program.Translation.Properties.Iso6391Code, m_settings.Language);
 
